@@ -1,8 +1,8 @@
-'''
-	@ Harris Christiansen (code@HarrisChristiansen.com)
-	Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
-	Generals.io Bot Commands
-'''
+"""
+    @ Harris Christiansen (code@HarrisChristiansen.com)
+    Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
+    Generals.io Bot Commands
+"""
 
 import random
 import threading
@@ -17,12 +17,12 @@ class BotCommands(object):
         self._bot = bot
         self._permitted_username = ""
 
-    def setMap(self, gamemap):
+    def set_map(self, gamemap):
         self._map = gamemap
 
     # ======================== Bot Commands ======================== #
 
-    def _get_command(self, msg, isFromChat, username):
+    def _get_command(self, msg, is_from_chat, username):
         msg_lower = msg.lower()
         command = msg.split(' ')
         command_len = len(command)
@@ -39,26 +39,26 @@ class BotCommands(object):
                 base_command = command[0].lower()
                 arg_command = " ".join(command[1:])
 
-        return (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username)
+        return (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username)
 
     def handle_command(self, msg, isFromChat=False, username=""):
         commandlist = self._get_command(msg, isFromChat, username)
 
-        if self._handleStartCommand(commandlist):
+        if self._handle_start_command(commandlist):
             return True
 
-        if self._handleChatCommand(commandlist):
+        if self._handle_chat_command(commandlist):
             return True
 
-        if self._handleUnrestrictedCommand(commandlist):
+        if self._handle_unrestricted_command(commandlist):
             return True
 
-        if self._handleRestrictedCommand(commandlist):
+        if self._handle_restricted_command(commandlist):
             return True
 
         return False
 
-    def _handleStartCommand(self, commandlist):
+    def _handle_start_command(self, commandlist):
         (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = commandlist
 
         if len(msg) < 12 and any(k in msg_lower for k in START_KEYWORDS):
@@ -70,10 +70,10 @@ class BotCommands(object):
 
         return False
 
-    def _handleChatCommand(self, commandlist):
+    def _handle_chat_command(self, commandlist):
         (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = commandlist
 
-        if self._handlePlayerCommand(msg, username):
+        if self._handle_player_command(msg, username):
             return True
         if base_command.startswith(tuple(HELP_KEYWORDS)):
             self._print_command_help(isFromChat)
@@ -84,7 +84,7 @@ class BotCommands(object):
 
         return False
 
-    def _handleUnrestrictedCommand(self, commandlist):
+    def _handle_unrestricted_command(self, commandlist):
         (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = commandlist
 
         if "setup" in base_command:
@@ -101,22 +101,22 @@ class BotCommands(object):
 
         return False
 
-    def _handleRestrictedCommand(self, commandlist):
-        (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = commandlist
+    def _handle_restricted_command(self, command_list):
+        (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = command_list
 
         if self._permitted_username != "" and self._permitted_username != username:  # Only allow permitted user
             return False
 
-        if self._handleSetupCommand(commandlist):
+        if self._handle_setup_command(command_list):
             return True
 
-        if self._handleGameCommand(commandlist):
+        if self._handle_game_command(command_list):
             return True
 
         return False
 
-    def _handleSetupCommand(self, commandlist):
-        (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = commandlist
+    def _handle_setup_command(self, command_list):
+        (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = command_list
 
         if "map" in base_command:
             if command_len >= 2:
@@ -154,7 +154,7 @@ class BotCommands(object):
                     self._bot.set_normal_map(width=float(arg_command))
                     return True
                 except ValueError:
-                    None
+                    pass
             self._bot.set_normal_map(width=1.0)
             return True
         elif "height" in base_command:
@@ -163,7 +163,7 @@ class BotCommands(object):
                     self._bot.set_normal_map(height=float(arg_command))
                     return True
                 except ValueError:
-                    None
+                    pass
             self._bot.set_normal_map(height=1.0)
             return True
         elif "city" in base_command:
@@ -172,7 +172,7 @@ class BotCommands(object):
                     self._bot.set_normal_map(city=float(arg_command))
                     return True
                 except ValueError:
-                    None
+                    pass
             self._bot.set_normal_map(city=1.0)
             return True
         elif "mountain" in base_command:
@@ -181,7 +181,7 @@ class BotCommands(object):
                     self._bot.set_normal_map(mountain=float(arg_command))
                     return True
                 except ValueError:
-                    None
+                    pass
             self._bot.set_normal_map(mountain=1.0)
             return True
         elif "swamp" in base_command:
@@ -190,7 +190,7 @@ class BotCommands(object):
                     self._set_swamp_map(float(arg_command))
                     return True
                 except ValueError:
-                    None
+                    pass
             self._set_swamp_map()
             return True
         elif isFromChat and len(msg) < 12 and "map" in msg_lower:
@@ -199,7 +199,7 @@ class BotCommands(object):
 
         return False
 
-    def _handleGameCommand(self, commandlist):
+    def _handle_game_command(self, commandlist):
         (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = commandlist
 
         if "take" in base_command and username != "":
@@ -236,8 +236,8 @@ class BotCommands(object):
 
     # ======================== Sending Messages ======================== #
 
-    def _print_command_help(self, isFromChat=False):
-        if isFromChat:
+    def _print_command_help(self, is_from_chat=False):
+        if is_from_chat:
             self._bot.sent_hello = True
             for txt in GAME_HELP_TEXT if "_map" in dir(self) else PRE_HELP_TEXT:
                 self._bot.send_chat(txt)
@@ -258,8 +258,8 @@ class BotCommands(object):
 
     def _add_teammate(self, username):
         if "_map" in dir(self) and "usernames" in dir(self._map):
-            if username != "" and username != self._map.usernames[
-                self._map.player_index] and username in self._map.usernames:
+            if username != "" and username != self._map.usernames[self._map.player_index] and \
+                    username in self._map.usernames:
                 self._map.do_not_attack_players.append(self._map.usernames.index(username))
                 return True
         return False
@@ -278,14 +278,14 @@ class BotCommands(object):
 
     def _start_avoiding_team(self):
         while True:
-            if not "teams" in dir(self._bot):
+            if "teams" not in dir(self._bot):
                 time.sleep(0.1)
                 continue
             for i, members in self._bot.teams.items():
                 if self._bot.username in members:
                     if len(members) > 1:  # More than 1 person on bots team
                         for team in range(1, MAX_NUM_TEAMS + 1):
-                            if not team in self._bot.teams:
+                            if team not in self._bot.teams:
                                 self._bot.set_game_team(team)
                                 break
 
@@ -330,7 +330,7 @@ class BotCommands(object):
 
     # ======================== Player Requested Commands ======================== #
 
-    def _handlePlayerCommand(self, msg, username):
+    def _handle_player_command(self, msg, username):
         if "boomer" in username.lower():
             self._bot.send_chat("Okay Boomer <3")
             return True

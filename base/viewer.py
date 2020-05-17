@@ -1,8 +1,8 @@
-'''
-	@ Harris Christiansen (code@HarrisChristiansen.com)
-	Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
-	Game Viewer
-'''
+"""
+    @ Harris Christiansen (code@HarrisChristiansen.com)
+    Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
+    Game Viewer
+"""
 
 import logging
 import pygame
@@ -63,7 +63,7 @@ class GeneralsViewer(object):
 
         pygame.quit()  # Done. Quit pygame.
 
-    ''' ======================== Call to update viewer with new map state ======================== '''
+    """ ======================== Call to update viewer with new map state ======================== """
 
     def updateGrid(self, update):
         updateDir = dir(update)
@@ -83,7 +83,7 @@ class GeneralsViewer(object):
 
         return self
 
-    ''' ======================== PRIVATE METHODS - Viewer Init - PRIVATE METHODS ======================== '''
+    """ ======================== PRIVATE METHODS - Viewer Init - PRIVATE METHODS ======================== """
 
     def _initViewier(self):
         pygame.init()
@@ -96,7 +96,7 @@ class GeneralsViewer(object):
         self._screen = pygame.display.set_mode(self._window_size)
 
         window_title = "Generals IO Bot"
-        if self._name != None:
+        if self._name is not None:
             window_title += " - " + str(self._name)
         pygame.display.set_caption(window_title)
         self._font = pygame.font.SysFont('Arial', CELL_HEIGHT - 10)
@@ -105,7 +105,7 @@ class GeneralsViewer(object):
 
         self._clock = pygame.time.Clock()
 
-    ''' ======================== Handle Clicks ======================== '''
+    """ ======================== Handle Clicks ======================== """
 
     def _handleClick(self, pos):
         if pos[1] < ABOVE_GRID_HEIGHT:
@@ -129,10 +129,10 @@ class GeneralsViewer(object):
         self._window_size[1] = window_height
         self._screen = pygame.display.set_mode(self._window_size)
 
-    ''' ======================== Handle Keypresses ======================== '''
+    """ ======================== Handle Keypresses ======================== """
 
     def _handleKeypress(self, key):
-        if self._clicked == None or self._moveEvent == None:
+        if self._clicked is None or self._moveEvent is None:
             return False
         column = self._clicked[0]
         row = self._clicked[1]
@@ -151,11 +151,11 @@ class GeneralsViewer(object):
             if row < self._map.rows - 1:
                 target = (column, row + 1)
 
-        if target != None:
+        if target is not None:
             self._moveEvent(self._clicked, target)
             self._clicked = target
 
-    ''' ======================== Viewer Drawing ======================== '''
+    """ ======================== Viewer Drawing ======================== """
 
     def _drawViewer(self):
         self._screen.fill(BLACK)  # Set BG Color
@@ -187,7 +187,7 @@ class GeneralsViewer(object):
         score_width = self._window_size[0] / len(self._scores)
         for i, score in enumerate(self._scores):
             score_color = PLAYER_COLORS[int(score['i'])]
-            if score['dead'] == True:
+            if score['dead']:
                 score_color = GRAY_DARK
             pygame.draw.rect(self._screen, score_color, [score_width * i, pos_top, score_width, SCORES_ROW_HEIGHT])
             self._screen.blit(self._font.render(self._map.usernames[int(score['i'])], True, WHITE),
@@ -236,7 +236,7 @@ class GeneralsViewer(object):
                     self._screen.blit(self._font.render("±", True, color_font), (pos_left + 9, pos_top + 7))
 
                 # Draw Path
-                if self._path != None and (column, row) in self._path:
+                if self._path is not None and (column, row) in self._path:
                     self._screen.blit(self._fontLrg.render("*", True, color_font), (pos_left + 5, pos_top - 3))
-                if self._collect_path != None and (column, row) in self._collect_path:
+                if self._collect_path is not None and (column, row) in self._collect_path:
                     self._screen.blit(self._fontLrg.render("*", True, PLAYER_COLORS[8]), (pos_left + 6, pos_top + 6))

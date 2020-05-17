@@ -1,8 +1,8 @@
-'''
-	@ Harris Christiansen (code@HarrisChristiansen.com)
-	Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
-	Generals.io Web Socket Communication
-'''
+"""
+    @ Harris Christiansen (code@HarrisChristiansen.com)
+    Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
+    Generals.io Web Socket Communication
+"""
 
 import logging
 import json
@@ -107,14 +107,14 @@ class Generals(object):
         try:
             if self._seen_update:
                 self._send(["chat_message", self._start_data['chat_room'], msg, None, ""])
-            elif self._gameid != None:
+            elif self._gameid is not None:
                 self._send(["chat_message", "chat_custom_queue_" + self._gameid, msg, None, ""])
         except WebSocketConnectionClosedException:
             pass
 
-    ######################### PRIVATE FUNCTIONS - PRIVATE FUNCTIONS #########################
+    # ======================== PRIVATE FUNCTIONS - PRIVATE FUNCTIONS ======================== #
 
-    ######################### Server -> Client #########################
+    # ======================== Server -> Client ======================== #
 
     def _log_queue_update(self, msg):
         if 'queueTimeLeft' in msg:
@@ -140,7 +140,7 @@ class Generals(object):
         if not self._seen_update:
             self._seen_update = True
             self._map = map.Map(self._start_data, data)
-            self._bot_cmds().setMap(self._map)
+            self._bot_cmds().set_map(self._map)
             logging.info("Joined Game: %s - %s" % (self._map.replay_url, self._map.usernames))
             return self._map
 
@@ -161,11 +161,11 @@ class Generals(object):
         return self._bot_cmds().handle_command(msg, from_chat, username)
 
     def _bot_cmds(self):
-        if not "_commands" in dir(self):
+        if "_commands" not in dir(self):
             self._commands = bot_cmds.BotCommands(self)
         return self._commands
 
-    ######################### Client -> Server #########################
+    # ======================== Client -> Server ======================== #
 
     def _connect_and_join(self, userid, username, mode, gameid, force_start, public_server):
         logging.debug("Creating connection")

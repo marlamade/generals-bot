@@ -1,11 +1,12 @@
-'''
-	@ Harris Christiansen (code@HarrisChristiansen.com)
-	Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
-	Bot_blob: Creates a blob of troops.
-'''
+"""
+    @ Harris Christiansen (code@HarrisChristiansen.com)
+    Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
+    Bot_blob: Creates a blob of troops.
+"""
 
 import logging
 from base import bot_moves
+import startup
 
 # Show all logging
 logging.basicConfig(level=logging.DEBUG)
@@ -16,10 +17,10 @@ _bot = None
 _map = None
 
 
-def make_move(currentBot, currentMap):
+def make_move(current_bot, current_map):
     global _bot, _map
-    _bot = currentBot
-    _map = currentMap
+    _bot = current_bot
+    _map = current_map
 
     if move_priority():
         return
@@ -70,7 +71,6 @@ def move_toward():
 # ======================== Main ======================== #
 
 # Start Game
-import startup
 
 if __name__ == '__main__':
     startup.startup(make_move, botName="PurdueBot-B2")

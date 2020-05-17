@@ -1,11 +1,12 @@
-'''
-	@ Harris Christiansen (code@HarrisChristiansen.com)
-	Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
-	Bot_control: Create a human controlled bot
-'''
+"""
+    @ Harris Christiansen (code@HarrisChristiansen.com)
+    Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
+    Bot_control: Create a human controlled bot
+"""
 
 import logging
 from base import bot_moves
+import startup
 
 # Set logging level
 logging.basicConfig(level=logging.INFO)
@@ -42,7 +43,7 @@ def place_move(source, dest):
 # ======================== Manual Control ======================== #
 
 def add_next_move(source_xy, dest_xy):
-    if _map == None:
+    if _map is None:
         return False
 
     source = _map.grid[source_xy[1]][source_xy[0]]
@@ -99,7 +100,6 @@ def move_toward():
 # ======================== Main ======================== #
 
 # Start Game
-import startup
 
 if __name__ == '__main__':
     startup.startup(make_move, moveEvent=add_next_move, botName="PurdueBot-H")

@@ -1,8 +1,8 @@
-'''
-	@ Harris Christiansen (code@HarrisChristiansen.com)
-	Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
-	Constants: Constants used throughout the code
-'''
+"""
+    @ Harris Christiansen (code@HarrisChristiansen.com)
+    Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
+    Constants: Constants used throughout the code
+"""
 
 SHOULD_DIRTY_MAP_ON_MOVE = True
 

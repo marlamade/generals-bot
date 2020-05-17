@@ -1,12 +1,13 @@
-'''
-	@ Harris Christiansen (code@HarrisChristiansen.com)
-	Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
-	bot_test: Used for testing various move methods
-'''
+"""
+    @ Harris Christiansen (code@HarrisChristiansen.com)
+    Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
+    bot_test: Used for testing various move methods
+"""
 
 import logging
 import time
 from base import bot_moves
+import startup
 
 PRINT_TIMING = False
 PRINT_MOVES = False
@@ -78,7 +79,6 @@ def move_toward():
 # ======================== Main ======================== #
 
 # Start Game
-import startup
 
 if __name__ == '__main__':
     startup.startup(make_move, botName="PurdueBot-T")

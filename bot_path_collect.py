@@ -1,12 +1,13 @@
-'''
-	@ Harris Christiansen (code@HarrisChristiansen.com)
-	Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
-	Path Collect Both: Collects troops along a path, and attacks outward using path.
-'''
+"""
+    @ Harris Christiansen (code@HarrisChristiansen.com)
+    Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
+    Path Collect Both: Collects troops along a path, and attacks outward using path.
+"""
 
 import logging
 import random
 from base import bot_base, bot_moves
+import startup
 
 # Show all logging
 logging.basicConfig(level=logging.INFO)
@@ -45,7 +46,7 @@ def make_primary_move():
     update_primary_target()
     if len(_map.path) > 1:
         return move_primary_path_forward()
-    elif _target != None:
+    elif _target is not None:
         new_primary_path()
     return False
 
@@ -63,7 +64,7 @@ def update_primary_target():
     if pathLength > 2:
         movesLeft = pathLength - _path_position - 1
 
-    if _target != None:  # Refresh Target Tile State
+    if _target is not None:  # Refresh Target Tile State
         _target = _map.grid[_target.y][_target.x]
         if movesLeft <= 2:  # Make target appear smaller to avoid un-targeting # TEMP-FIX
             _target.army = _target.army / 5
@@ -114,12 +115,12 @@ def new_primary_path(restoreOldPosition=False):
 
     # Determine Source and Path
     source = _map.find_city()
-    if source == None:
+    if source is None:
         source = _map.find_largest_tile(includeGeneral=True)
     _map.path = source.path_to(_target)  # Find new path to target
 
     # Restore Old Tile
-    if restoreOldPosition and old_tile != None:
+    if restoreOldPosition and old_tile is not None:
         for i, tile in enumerate(_map.path):
             if (tile.x, tile.y) == (old_tile.x, old_tile.y):
                 _path_position = i
@@ -143,7 +144,7 @@ def move_outward():
 def find_collect_path():
     # Find Largest Tile
     source = _map.find_largest_tile(notInPath=_map.path, includeGeneral=0.33)
-    if (source == None or source.army < 4):
+    if (source is None or source.army < 4):
         _map.collect_path = []
         return _map.collect_path
 
@@ -151,7 +152,7 @@ def find_collect_path():
     dest = None
     if source.army > 40:
         dest = source.nearest_target_tile()
-    if dest == None:
+    if dest is None:
         dest = source.nearest_tile_in_path(_map.path)
 
     # Return Path
@@ -164,7 +165,7 @@ def move_collect_to_path():
 
     # Perform Move
     (move_from, move_to) = bot_moves.move_path(_map.collect_path)
-    if move_from != None:
+    if move_from is not None:
         place_move(move_from, move_to)
         return True
 
@@ -174,7 +175,6 @@ def move_collect_to_path():
 # ======================== Main ======================== #
 
 # Start Game
-import startup
 
 if __name__ == '__main__':
     startup.startup(make_move, botName="PurdueBot-P2")

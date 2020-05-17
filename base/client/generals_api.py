@@ -1,8 +1,8 @@
-'''
-	@ Harris Christiansen (code@HarrisChristiansen.com)
-	Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
-	Generals.io Web API Requests
-'''
+"""
+    @ Harris Christiansen (code@HarrisChristiansen.com)
+    Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
+    Generals.io Web API Requests
+"""
 
 import requests
 
@@ -13,7 +13,7 @@ _list_top = None
 
 def list_top():
     global _list_top
-    if _list_top == None:
+    if _list_top is None:
         _list_top = _get_list_maps("http://generals.io/api/maps/lists/top")
     return _list_top
 
@@ -23,7 +23,7 @@ _list_hot = None
 
 def list_hot():
     global _list_hot
-    if _list_hot == None:
+    if _list_hot is None:
         _list_hot = _get_list_maps("http://generals.io/api/maps/lists/hot")
     return _list_hot
 

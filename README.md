@@ -27,14 +27,14 @@ Project available on [GitHub](https://github.com/harrischristiansen/generals-bot
 
 ### Bots
 - [X] bot_blob.py
-	- [X] move_toward: Run largest army to nearest priority target
-	- [X] move_outward: Move Border Armies Outward
+    - [X] move_toward: Run largest army to nearest priority target
+    - [X] move_outward: Move Border Armies Outward
 - [ ] bot_path_collect.py
-	- [X] Primary Path Routine: Run path from largest city to primary target
-		- [ ] Continue running after reaching primary target
-	- [X] Collect Troops Routine (Run largest army toward nearest path tile)
-	- [X] Move Border Armies Outward
-	- [ ] Proximity Targeting
+    - [X] Primary Path Routine: Run path from largest city to primary target
+        - [ ] Continue running after reaching primary target
+    - [X] Collect Troops Routine (Run largest army toward nearest path tile)
+    - [X] Move Border Armies Outward
+    - [ ] Proximity Targeting
 
 ### Sample Code
 - [ ] samples/nearest.py: Run largest army to nearest priority target

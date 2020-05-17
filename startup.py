@@ -1,8 +1,8 @@
-'''
-	@ Harris Christiansen (code@HarrisChristiansen.com)
-	Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
-	Startup: Initiate Bots with command line arguments
-'''
+"""
+    @ Harris Christiansen (code@HarrisChristiansen.com)
+    Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
+    Startup: Initiate Bots with command line arguments
+"""
 import os
 import argparse
 from base import bot_base
@@ -21,9 +21,9 @@ def startup(moveMethod, moveEvent=None, botName="PurdueBot"):
     parser.add_argument('--public', action='store_true', help="Run on public (not bot) server")
     args = vars(parser.parse_args())
 
-    if moveMethod == None:
+    if moveMethod is None:
         raise ValueError("A move method must be supplied upon startup")
 
-    bot_base.GeneralsBot(moveMethod, moveEvent=moveEvent, name=args['name'], gameType=args['gameType'],
-                         privateRoomID=args['roomID'], showGameViewer=args['no_ui'], public_server=args['public'],
+    bot_base.GeneralsBot(moveMethod, move_event=moveEvent, name=args['name'], game_type=args['gameType'],
+                         private_room_id=args['roomID'], show_game_viewer=args['no_ui'], public_server=args['public'],
                          start_msg_cmd=args['command'])

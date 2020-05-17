@@ -1,8 +1,8 @@
-'''
-	@ Harris Christiansen (code@HarrisChristiansen.com)
-	Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
-	Generals Bot: Base Bot Class
-'''
+"""
+    @ Harris Christiansen (code@HarrisChristiansen.com)
+    Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
+    Generals Bot: Base Bot Class
+"""
 
 import logging
 import os
@@ -17,13 +17,13 @@ from .viewer import GeneralsViewer
 
 
 class GeneralsBot(object):
-    def __init__(self, moveMethod, moveEvent=None, name="PurdueBot", gameType="private", privateRoomID=None,
-                 showGameViewer=True, public_server=False, start_msg_cmd=""):
+    def __init__(self, move_method, move_event=None, name="PurdueBot", game_type="private", private_room_id=None,
+                 show_game_viewer=True, public_server=False, start_msg_cmd=""):
         # Save Config
-        self._moveMethod = moveMethod
+        self._moveMethod = move_method
         self._name = name
-        self._gameType = gameType
-        self._privateRoomID = privateRoomID
+        self._gameType = game_type
+        self._privateRoomID = private_room_id
         self._public_server = public_server
         self._start_msg_cmd = start_msg_cmd
 
@@ -35,11 +35,11 @@ class GeneralsBot(object):
         _create_thread(self._start_moves_thread)
 
         # Start Game Viewer
-        if showGameViewer:
+        if show_game_viewer:
             window_title = "%s (%s)" % (self._name, self._gameType)
-            if self._privateRoomID != None:
+            if self._privateRoomID is not None:
                 window_title = "%s (%s - %s)" % (self._name, self._gameType, self._privateRoomID)
-            self._viewer = GeneralsViewer(window_title, moveEvent=moveEvent)
+            self._viewer = GeneralsViewer(window_title, moveEvent=move_event)
             self._viewer.mainViewerLoop()  # Consumes Main Thread
             self._exit_game()
 
@@ -57,31 +57,31 @@ class GeneralsBot(object):
         _create_thread(self._send_start_msg_cmd)
 
         # Start Receiving Updates
-        for gamemap in self._game.get_updates():
-            self._set_update(gamemap)
+        for game_map in self._game.get_updates():
+            self._set_update(game_map)
 
-            if not gamemap.complete:
+            if not game_map.complete:
                 self._move_event.set()  # Permit another move
 
         self._exit_game()
 
-    def _set_update(self, gamemap):
-        self._map = gamemap
-        selfDir = dir(self)
+    def _set_update(self, game_map):
+        self._map = game_map
+        self_dir = dir(self)
 
         # Update GeneralsViewer Grid
-        if '_viewer' in selfDir:
-            if '_moves_realized' in selfDir:
+        if '_viewer' in self_dir:
+            if '_moves_realized' in self_dir:
                 self._map.bottomText = "Realized: " + str(self._moves_realized)
-            viewer = self._viewer.updateGrid(gamemap)
+            viewer = self._viewer.updateGrid(game_map)
 
         # Handle Game Complete
-        if gamemap.complete and not self._has_completed:
-            logging.info("!!!! Game Complete. Result = " + str(gamemap.result) + " !!!!")
-            if '_moves_realized' in selfDir:
+        if game_map.complete and not self._has_completed:
+            logging.info("!!!! Game Complete. Result = " + str(game_map.result) + " !!!!")
+            if '_moves_realized' in self_dir:
                 logging.info("Moves: %d, Realized: %d" % (self._map.turn, self._moves_realized))
             _create_thread(self._exit_game)
-        self._has_completed = gamemap.complete
+        self._has_completed = game_map.complete
 
     def _exit_game(self):
         time.sleep(1.1)

@@ -1,8 +1,8 @@
-'''
-	@ Harris Christiansen (code@HarrisChristiansen.com)
-	Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
-	Tile: Objects for representing Generals IO Tiles
-'''
+"""
+    @ Harris Christiansen (code@HarrisChristiansen.com)
+    Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
+    Tile: Objects for representing Generals IO Tiles
+"""
 
 from queue import Queue
 import time
@@ -32,8 +32,8 @@ class Tile(object):
     def __repr__(self):
         return "(%2d,%2d)[%2d,%3d]" % (self.x, self.y, self.tile, self.army)
 
-    '''def __eq__(self, other):
-			return (other != None and self.x==other.x and self.y==other.y)'''
+    """def __eq__(self, other):
+            return (other is not None and self.x==other.x and self.y==other.y)"""
 
     def __lt__(self, other):
         return self.army < other.army
@@ -77,13 +77,13 @@ class Tile(object):
             gamemap.generals[tile] = self
             self._general_index = self.tile
 
-    ######## ======================== Tile Properties ======================== ########
+    # ======================== Tile Properties ======================== #
 
     def isDirty(self):
         return (time.time() - self._dirtyUpdateTime) < 0.6
 
     def distance_to(self, dest):
-        if dest != None:
+        if dest is not None:
             return abs(self.x - dest.x) + abs(self.y - dest.y)
         return 0
 
@@ -128,7 +128,7 @@ class Tile(object):
             return False
         return True
 
-    ######## ======================== Select Neighboring Tile ======================== ########
+    # ======================== Select Neighboring Tile ======================== #
 
     def neighbor_to_attack(self, path=[]):
         if not self.isSelf():
@@ -136,14 +136,15 @@ class Tile(object):
 
         target = None
         for neighbor in self.neighbors(includeSwamps=True):
-            if (
-                    neighbor.shouldAttack() and self.army > neighbor.army + 1) or neighbor in path:  # Move into caputurable target Tiles
+            # Move into caputurable target Tiles
+            if (neighbor.shouldAttack() and self.army > neighbor.army + 1) or neighbor in path:
                 if not neighbor.isSwamp:
-                    if target == None:
+                    if target is None:
                         target = neighbor
                     elif neighbor.isCity and (not target.isCity or target.army > neighbor.army):
                         target = neighbor
-                    elif not neighbor.isEmpty and neighbor.army <= 1 and target.isEmpty:  # Special case, prioritize opponents with 1 army over empty tiles
+                    # Special case, prioritize opponents with 1 army over empty tiles
+                    elif not neighbor.isEmpty and neighbor.army <= 1 and target.isEmpty:
                         target = neighbor
                     elif target.army > neighbor.army and not target.isCity:
                         if neighbor.isEmpty:
@@ -156,7 +157,7 @@ class Tile(object):
 
         return target
 
-    ######## ======================== Select Distant Tile ======================== ########
+    # ======================== Select Distant Tile ======================== #
 
     def nearest_tile_in_path(self, path):
         dest = None
@@ -180,7 +181,8 @@ class Tile(object):
         for x in range(self._map.cols):  # Check Each Square
             for y in range(self._map.rows):
                 tile = self._map.grid[y][x]
-                if not tile.isValidTarget() or tile.shouldNotAttack() or tile.army > max_target_army:  # Non Target Tiles
+                # Non Target Tiles
+                if not tile.isValidTarget() or tile.shouldNotAttack() or tile.army > max_target_army:
                     continue
 
                 distance = self.distance_to(tile)
@@ -209,10 +211,10 @@ class Tile(object):
 
         return dest
 
-    ######## ======================== Pathfinding ======================== ########
+    # ======================== Pathfinding ======================== #
 
     def path_to(self, dest, includeCities=False):
-        if dest == None:
+        if dest is None:
             return []
 
         frontier = Queue()
@@ -249,7 +251,7 @@ class Tile(object):
 
         return path
 
-    ######## ======================== PRIVATE FUNCTIONS ======================== ########
+    # ======================== PRIVATE FUNCTIONS ======================== #
 
     def _setNeighbors(self):
         x = self.x
@@ -269,7 +271,7 @@ def _path_reconstruct(came_from, dest):
     current = dest
     path = [current]
     try:
-        while came_from[current] != None:
+        while came_from[current] is not None:
             current = came_from[current]
             path.append(current)
     except KeyError:
