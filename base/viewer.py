@@ -39,6 +39,11 @@ class GeneralsViewer(object):
         self._receivedUpdate = False
         self._showGrid = True
         self._clicked = None
+        self._map = None
+        self._scores = None
+        self._bottomText = None
+        self._path = None
+        self._collect_path = None
 
     def mainViewerLoop(self):
         while not self._receivedUpdate:  # Wait for first update

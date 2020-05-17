@@ -12,7 +12,7 @@ from .constants import *
 
 
 class Tile(object):
-    def __init__(self, gamemap, x, y):
+    def __init__(self, game_map, x, y):
         # Public Properties
         self.x = x  # Integer X Coordinate
         self.y = y  # Integer Y Coordinate
@@ -25,7 +25,7 @@ class Tile(object):
         self.isGeneral = False  # Boolean isGeneral
 
         # Private Properties
-        self._map = gamemap  # Pointer to Map Object
+        self._map = game_map  # Pointer to Map Object
         self._general_index = -1  # Player Index if tile is a general
         self._dirtyUpdateTime = 0  # Last time Tile was updated by bot, not server
 
@@ -38,28 +38,28 @@ class Tile(object):
     def __lt__(self, other):
         return self.army < other.army
 
-    def setNeighbors(self, gamemap):
-        self._map = gamemap
+    def setNeighbors(self, game_map):
+        self._map = game_map
         self._setNeighbors()
 
     def setIsSwamp(self, isSwamp):
         self.isSwamp = isSwamp
 
-    def update(self, gamemap, tile, army, isCity=False, isGeneral=False, isDirty=False):
-        self._map = gamemap
+    def update(self, game_map, tile, army, isCity=False, isGeneral=False, isDirty=False):
+        self._map = game_map
 
-        if (isDirty):
+        if isDirty:
             self._dirtyUpdateTime = time.time()
 
         if self.tile < 0 or tile >= TILE_MOUNTAIN or (tile < TILE_MOUNTAIN and self.isSelf()):  # Tile should be updated
             if (tile >= 0 or self.tile >= 0) and self.tile != tile:  # Remember Discovered Tiles
-                self.turn_captured = gamemap.turn
+                self.turn_captured = game_map.turn
                 if self.tile >= 0:
-                    gamemap.tiles[self.tile].remove(self)
+                    game_map.tiles[self.tile].remove(self)
                 if tile >= 0:
-                    gamemap.tiles[tile].append(self)
-            if tile == gamemap.player_index:
-                self.turn_held = gamemap.turn
+                    game_map.tiles[tile].append(self)
+            if tile == game_map.player_index:
+                self.turn_held = game_map.turn
             self.tile = tile
         if self.army == 0 or army > 0 or tile >= TILE_MOUNTAIN or self.isSwamp:  # Remember Discovered Armies
             self.army = army
@@ -67,14 +67,14 @@ class Tile(object):
         if isCity:
             self.isCity = True
             self.isGeneral = False
-            if self not in gamemap.cities:
-                gamemap.cities.append(self)
+            if self not in game_map.cities:
+                game_map.cities.append(self)
             if self._general_index != -1 and self._general_index < 8:
-                gamemap.generals[self._general_index] = None
+                game_map.generals[self._general_index] = None
                 self._general_index = -1
         elif isGeneral:
             self.isGeneral = True
-            gamemap.generals[tile] = self
+            game_map.generals[tile] = self
             self._general_index = self.tile
 
     # ======================== Tile Properties ======================== #
@@ -130,7 +130,9 @@ class Tile(object):
 
     # ======================== Select Neighboring Tile ======================== #
 
-    def neighbor_to_attack(self, path=[]):
+    def neighbor_to_attack(self, path=None):
+        if path is None:
+            path = []
         if not self.isSelf():
             return None
 
@@ -219,10 +221,8 @@ class Tile(object):
 
         frontier = Queue()
         frontier.put(self)
-        came_from = {}
-        came_from[self] = None
-        army_count = {}
-        army_count[self] = self.army
+        came_from = {self: None}
+        army_count = {self: self.army}
 
         while not frontier.empty():
             current = frontier.get()
@@ -275,7 +275,7 @@ def _path_reconstruct(came_from, dest):
             current = came_from[current]
             path.append(current)
     except KeyError:
-        None
+        pass
     path.reverse()
 
     return path

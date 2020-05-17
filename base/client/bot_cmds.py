@@ -16,9 +16,10 @@ class BotCommands(object):
     def __init__(self, bot):
         self._bot = bot
         self._permitted_username = ""
+        self._map = None
 
-    def set_map(self, gamemap):
-        self._map = gamemap
+    def set_map(self, game_map):
+        self._map = game_map
 
     # ======================== Bot Commands ======================== #
 
@@ -39,21 +40,21 @@ class BotCommands(object):
                 base_command = command[0].lower()
                 arg_command = " ".join(command[1:])
 
-        return (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username)
+        return msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username
 
     def handle_command(self, msg, isFromChat=False, username=""):
-        commandlist = self._get_command(msg, isFromChat, username)
+        command_list = self._get_command(msg, isFromChat, username)
 
-        if self._handle_start_command(commandlist):
+        if self._handle_start_command(command_list):
             return True
 
-        if self._handle_chat_command(commandlist):
+        if self._handle_chat_command(command_list):
             return True
 
-        if self._handle_unrestricted_command(commandlist):
+        if self._handle_unrestricted_command(command_list):
             return True
 
-        if self._handle_restricted_command(commandlist):
+        if self._handle_restricted_command(command_list):
             return True
 
         return False

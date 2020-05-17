@@ -36,7 +36,7 @@ def make_move(currentBot, currentMap):
 
     if PRINT_TIMING:
         move_time = time.time() - start_time
-        logging.info("Move (%d) took: %1.7fs" % move_time)
+        logging.info("Move (%d) took: %1.7fs" % (_map.turn, move_time))
 
 
 def place_move(source, dest):

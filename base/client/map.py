@@ -72,8 +72,10 @@ class Map(object):
 
     # ======================== Map Search/Selection ======================== #
 
-    def find_city(self, ofType=None, notOfType=None, notInPath=[], findLargest=True, includeGeneral=False):
+    def find_city(self, ofType=None, notOfType=None, notInPath=None, findLargest=True, includeGeneral=False):
         # ofType = Integer, notOfType = Integer, notInPath = [Tile], findLargest = Boolean
+        if notInPath is None:
+            notInPath = []
         if ofType is None and notOfType is None:
             ofType = self.player_index
 
@@ -97,9 +99,11 @@ class Map(object):
 
         return found_city
 
-    def find_largest_tile(self, ofType=None, notInPath=[],
+    def find_largest_tile(self, ofType=None, notInPath=None,
                           includeGeneral=False):
         # ofType = Integer, notInPath = [Tile], includeGeneral = False|True|Int Acceptable Largest|0.1->0.9 Ratio
+        if notInPath is None:
+            notInPath = []
         if ofType is None:
             ofType = self.player_index
         general = self.generals[ofType]

@@ -12,10 +12,10 @@ from .client.constants import *
 
 # ======================== Move Priority Capture ======================== #
 
-def move_priority(gamemap):
+def move_priority(game_map):
     priority_move = (False, False)
-    generals_and_cities = [t for t in gamemap.generals if t is not None]
-    generals_and_cities.extend(gamemap.cities)
+    generals_and_cities = [t for t in game_map.generals if t is not None]
+    generals_and_cities.extend(game_map.cities)
 
     for tile in generals_and_cities:
         if not tile.shouldNotAttack():
@@ -32,15 +32,17 @@ def move_priority(gamemap):
 
 # ======================== Move Outward ======================== #
 
-def move_outward(gamemap, path=[]):
+def move_outward(game_map, path=None):
+    if path is None:
+        path = []
     move_swamp = (False, False)
 
-    for source in gamemap.tiles[gamemap.player_index]:  # Check Each Owned Tile
+    for source in game_map.tiles[game_map.player_index]:  # Check Each Owned Tile
         if source.army >= 2 and source not in path:  # Find One With Armies
             target = source.neighbor_to_attack(path)
             if target:
                 if not target.isSwamp:
-                    return (source, target)
+                    return source, target
                 move_swamp = (source, target)
 
     return move_swamp
@@ -50,7 +52,7 @@ def move_outward(gamemap, path=[]):
 
 def move_path(path):
     if len(path) < 2:
-        return (False, False)
+        return False, False
 
     source = path[0]
     target = path[-1]
@@ -77,7 +79,7 @@ def _move_path_largest(path):
             largest_index = i
 
     dest = path[largest_index + 1]
-    return (largest, dest)
+    return largest, dest
 
 
 def _move_path_capture(path):
@@ -90,22 +92,22 @@ def _move_path_capture(path):
             capture_army -= tile.army
 
         if capture_army > 0 and i + 1 < len(path) and path[i].army > 1:
-            return (path[i], path[i + 1])
+            return path[i], path[i + 1]
 
     return _move_path_largest(path)
 
 
 # ======================== Move Path Forward ======================== #
 
-def should_move_half(gamemap, source, dest=None):
+def should_move_half(game_map, source, dest=None):
     if dest is not None and dest.isCity:
         return False
 
-    if gamemap.turn > 250:
+    if game_map.turn > 250:
         if source.isGeneral:
             return random.choice([True, True, True, False])
         elif source.isCity:
-            if gamemap.turn - source.turn_captured < 16:
+            if game_map.turn - source.turn_captured < 16:
                 return True
             return random.choice([False, False, False, True])
     return False
@@ -113,22 +115,24 @@ def should_move_half(gamemap, source, dest=None):
 
 # ======================== Proximity Targeting - Pathfinding ======================== #
 
-def path_proximity_target(gamemap):
+def path_proximity_target(game_map):
     # Find path from largest tile to closest target
-    source = gamemap.find_largest_tile(includeGeneral=0.5)
+    source = game_map.find_largest_tile(includeGeneral=0.5)
     target = source.nearest_target_tile()
     path = source.path_to(target)
     # logging.info("Proximity %s -> %s via %s" % (source, target, path))
 
-    if not gamemap.canStepPath(path):
-        path = path_gather(gamemap)
+    if not game_map.canStepPath(path):
+        path = path_gather(game_map)
         # logging.info("Proximity FAILED, using path %s" % path)
     return path
 
 
-def path_gather(gamemap, elsoDo=[]):
-    target = gamemap.find_largest_tile()
-    source = gamemap.find_largest_tile(notInPath=[target], includeGeneral=0.5)
+def path_gather(game_map, elsoDo=None):
+    if elsoDo is None:
+        elsoDo = []
+    target = game_map.find_largest_tile()
+    source = game_map.find_largest_tile(notInPath=[target], includeGeneral=0.5)
     if source and target and source != target:
         return source.path_to(target)
     return elsoDo

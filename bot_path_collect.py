@@ -144,7 +144,7 @@ def move_outward():
 def find_collect_path():
     # Find Largest Tile
     source = _map.find_largest_tile(notInPath=_map.path, includeGeneral=0.33)
-    if (source is None or source.army < 4):
+    if source is None or source.army < 4:
         _map.collect_path = []
         return _map.collect_path
 
