@@ -33,7 +33,7 @@ class Generals(object):
         with self._lock:
             self._ws.close()
 
-    ######################### Get updates from server #########################
+    # ======================== Get updates from server ======================== #
 
     def get_updates(self):
         while True:
@@ -83,7 +83,7 @@ class Generals(object):
             else:
                 logging.info("Unknown message type: {}".format(msg))
 
-    ######################### Make Moves #########################
+    # ======================== Make Moves ======================== #
 
     def move(self, y1, x1, y2, x2, move_half=False):
         if not self._seen_update:
@@ -98,7 +98,7 @@ class Generals(object):
         self._send(["attack", a, b, move_half, self._move_id])
         self._move_id += 1
 
-    ######################### Send Chat Messages #########################
+    # ======================== Send Chat Messages ======================== #
 
     def send_chat(self, msg):
         if self.handle_command(msg):
@@ -247,7 +247,7 @@ class Generals(object):
         except WebSocketConnectionClosedException:
             pass
 
-    ######################### Game Replay #########################
+    # ======================== Game Replay ======================== #
 
     def _saveMessagesToDisk(self):
         fileName = "game_" + self._map.replay_url + ".txt"

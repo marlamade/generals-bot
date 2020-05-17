@@ -14,7 +14,7 @@ URL_REPLAY = "https://generalsio-replays-na.s3.amazonaws.com/"
 COUNT_BY = 200
 
 
-######################### Public Methods #########################
+# ======================== Public Methods ======================== #
 
 def mapstats(playername):
     replays = _get_list_replays(playername, NUM_REPLAYS_TO_USE)
@@ -56,7 +56,7 @@ def opponentstats(playername, mingames=0):
     return opponents_sorted
 
 
-######################### Private Methods #########################
+# ======================== Private Methods ======================== #
 
 def _get_list_replays(playername, count):
     replays = []

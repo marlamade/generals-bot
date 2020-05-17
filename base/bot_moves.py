@@ -9,7 +9,7 @@ import random
 from base import bot_base
 from .client.constants import *
 
-######################### Move Priority Capture #########################
+# ======================== Move Priority Capture ======================== #
 
 def move_priority(gamemap):
 	priority_move = (False, False)
@@ -27,7 +27,7 @@ def move_priority(gamemap):
 				break
 	return priority_move
 
-######################### Move Outward #########################
+# ======================== Move Outward ======================== #
 
 def move_outward(gamemap, path=[]):
 	move_swamp = (False, False)
@@ -43,7 +43,7 @@ def move_outward(gamemap, path=[]):
 	return move_swamp
 
 
-######################### Move Path Forward #########################
+# ======================== Move Path Forward ======================== #
 
 def move_path(path):
 	if len(path) < 2:
@@ -90,7 +90,7 @@ def _move_path_capture(path):
 
 	return _move_path_largest(path)
 
-######################### Move Path Forward #########################
+# ======================== Move Path Forward ======================== #
 
 def should_move_half(gamemap, source, dest=None):
 	if dest != None and dest.isCity:
@@ -126,7 +126,7 @@ def path_gather(gamemap, elsoDo=[]):
 		return source.path_to(target)
 	return elsoDo
 
-######################### Helpers #########################
+# ======================== Helpers ======================== #
 
 def _shuffle(seq):
 	shuffled = list(seq)

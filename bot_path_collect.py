@@ -11,7 +11,7 @@ from base import bot_base, bot_moves
 # Show all logging
 logging.basicConfig(level=logging.INFO)
 
-######################### Move Making #########################
+# ======================== Move Making ======================== #
 
 _bot = None
 _map = None
@@ -39,7 +39,7 @@ def place_move(source, dest):
     _bot.place_move(source, dest, move_half=bot_moves.should_move_half(_map, source, dest))
 
 
-######################### Primary Move Making #########################
+# ======================== Primary Move Making ======================== #
 
 def make_primary_move():
     update_primary_target()
@@ -50,7 +50,7 @@ def make_primary_move():
     return False
 
 
-######################### Primary Targeting #########################
+# ======================== Primary Targeting ======================== #
 
 _target = None
 _path_position = 0
@@ -74,7 +74,7 @@ def update_primary_target():
         new_primary_path(restoreOldPosition=True)
 
 
-######################### Primary Path #########################
+# ======================== Primary Path ======================== #
 
 def move_primary_path_forward():
     global _path_position
@@ -128,7 +128,7 @@ def new_primary_path(restoreOldPosition=False):
     return False
 
 
-######################### Move Outward #########################
+# ======================== Move Outward ======================== #
 
 def move_outward():
     (source, dest) = bot_moves.move_outward(_map, _map.path)
@@ -138,7 +138,7 @@ def move_outward():
     return False
 
 
-######################### Collect To Path #########################
+# ======================== Collect To Path ======================== #
 
 def find_collect_path():
     # Find Largest Tile
@@ -171,7 +171,7 @@ def move_collect_to_path():
     return False
 
 
-######################### Main #########################
+# ======================== Main ======================== #
 
 # Start Game
 import startup

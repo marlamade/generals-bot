@@ -10,7 +10,7 @@ from base import bot_moves
 # Show all logging
 logging.basicConfig(level=logging.DEBUG)
 
-######################### Move Making #########################
+# ======================== Move Making ======================== #
 
 _bot = None
 _map = None
@@ -36,7 +36,7 @@ def place_move(source, dest):
     _bot.place_move(source, dest, move_half=bot_moves.should_move_half(_map, source, dest))
 
 
-######################### Move Priority #########################
+# ======================== Move Priority ======================== #
 
 def move_priority():
     (source, dest) = bot_moves.move_priority(_map)
@@ -46,7 +46,7 @@ def move_priority():
     return False
 
 
-######################### Move Outward #########################
+# ======================== Move Outward ======================== #
 
 def move_outward():
     (source, dest) = bot_moves.move_outward(_map)
@@ -56,7 +56,7 @@ def move_outward():
     return False
 
 
-######################### Move Toward #########################
+# ======================== Move Toward ======================== #
 
 def move_toward():
     _map.path = bot_moves.path_proximity_target(_map)
@@ -67,7 +67,7 @@ def move_toward():
     return False
 
 
-######################### Main #########################
+# ======================== Main ======================== #
 
 # Start Game
 import startup

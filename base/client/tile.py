@@ -77,7 +77,7 @@ class Tile(object):
             gamemap.generals[tile] = self
             self._general_index = self.tile
 
-    ################################ Tile Properties ################################
+    ######## ======================== Tile Properties ======================== ########
 
     def isDirty(self):
         return (time.time() - self._dirtyUpdateTime) < 0.6
@@ -128,7 +128,7 @@ class Tile(object):
             return False
         return True
 
-    ################################ Select Neighboring Tile ################################
+    ######## ======================== Select Neighboring Tile ======================== ########
 
     def neighbor_to_attack(self, path=[]):
         if not self.isSelf():
@@ -156,7 +156,7 @@ class Tile(object):
 
         return target
 
-    ################################ Select Distant Tile ################################
+    ######## ======================== Select Distant Tile ======================== ########
 
     def nearest_tile_in_path(self, path):
         dest = None
@@ -209,7 +209,7 @@ class Tile(object):
 
         return dest
 
-    ################################ Pathfinding ################################
+    ######## ======================== Pathfinding ======================== ########
 
     def path_to(self, dest, includeCities=False):
         if dest == None:
@@ -249,7 +249,7 @@ class Tile(object):
 
         return path
 
-    ################################ PRIVATE FUNCTIONS ################################
+    ######## ======================== PRIVATE FUNCTIONS ======================== ########
 
     def _setNeighbors(self):
         x = self.x

@@ -48,7 +48,7 @@ class GeneralsBot(object):
 
         self._exit_game()
 
-    ######################### Handle Updates From Server #########################
+    # ======================== Handle Updates From Server ======================== #
 
     def _start_game_thread(self):
         # Create Game
@@ -90,7 +90,7 @@ class GeneralsBot(object):
         self._running = False
         os._exit(0)  # End Program
 
-    ######################### Move Generation #########################
+    # ======================== Move Generation ======================== #
 
     def _start_moves_thread(self):
         self._moves_realized = 0
@@ -103,7 +103,7 @@ class GeneralsBot(object):
     def _make_move(self):
         self._moveMethod(self, self._map)
 
-    ######################### Chat Messages #########################
+    # ======================== Chat Messages ======================== #
 
     def _start_chat_thread(self):
         # Send Chat Messages
@@ -118,7 +118,7 @@ class GeneralsBot(object):
         for cmd in self._start_msg_cmd.split("\\n"):
             self._game.handle_command(cmd)
 
-    ######################### Move Making #########################
+    # ======================== Move Making ======================== #
 
     def place_move(self, source, dest, move_half=False):
         if self._map.isValidPosition(dest.x, dest.y):
@@ -144,7 +144,7 @@ class GeneralsBot(object):
         return False
 
 
-######################### Global Helpers #########################
+# ======================== Global Helpers ======================== #
 
 def _create_thread(f):
     t = threading.Thread(target=f)

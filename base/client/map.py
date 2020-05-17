@@ -43,7 +43,7 @@ class Map(object):
 		self.exit_on_game_over = True													# Controls if bot exits after game over
 		self.do_not_attack_players = []													# List of player IDs not to attack
 	
-	################################ Game Updates ################################
+	######## ======================== Game Updates ======================== ########
 
 	def update(self, data):
 		if self.complete: # Game Over - Ignore Empty Board Updates
@@ -165,7 +165,7 @@ class Map(object):
 
 		return target
 
-	################################ Validators ################################
+	######## ======================== Validators ======================== ########
 
 	def isValidPosition(self, x, y):
 		return 0 <= y < self.rows and 0 <= x < self.cols and self._tile_grid[y][x] != TILE_MOUNTAIN
@@ -202,7 +202,7 @@ class Map(object):
 				return True
 		return True
 
-	################################ PRIVATE FUNCTIONS ################################
+	######## ======================== PRIVATE FUNCTIONS ======================== ########
 
 	def _getScores(self, data):
 		scores = {s['i']: s for s in data['scores']}

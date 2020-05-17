@@ -6,7 +6,7 @@
 
 import requests
 
-######################### Public Methods #########################
+# ======================== Public Methods ======================== #
 
 _list_top = None
 
@@ -38,7 +38,7 @@ def list_search(query):
     return _get_list_maps("http://generals.io/api/maps/search?q=" + query)
 
 
-######################### Private Methods #########################
+# ======================== Private Methods ======================== #
 
 def _get_list_maps(url):
     data = _get_url(url)
