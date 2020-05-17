@@ -20,20 +20,20 @@ class Map(object):
         self.replay_url = REPLAY_URLS["na"] + start_data['replay_id']  # String Replay URL
 
         # Map Properties
-        self._applyUpdateDiff(data)
+        self._apply_update_diff(data)
         self.rows = self.rows  # Integer Number Grid Rows
         self.cols = self.cols  # Integer Number Grid Cols
         self.grid = [[Tile(self, x, y) for x in range(self.cols)] for y in range(self.rows)]  # 2D List of Tile Objects
-        self._setNeighbors()
+        self._set_neighbors()
         self.swamps = [(c // self.cols, c % self.cols) for c in start_data['swamps']]  # List [(y,x)] of swamps
-        self._setSwamps()
+        self._set_swamps()
         self.turn = data['turn']  # Integer Turn # (1 turn / 0.5 seconds)
         self.tiles = [[] for x in range(12)]  # List of 8 (+ extra) Players Tiles
         self.cities = []  # List of City Tiles
         self.generals = [None for x in range(12)]  # List of 8 (+ extra) Generals (None if not found)
-        self._setGenerals()
+        self._set_generals()
         self.stars = []  # List of Player Star Ratings
-        self.scores = self._getScores(data)  # List of Player Scores
+        self.scores = self._get_scores(data)  # List of Player Scores
         self.complete = False  # Boolean Game Complete
         self.result = False  # Boolean Game Result (True = Won)
 
@@ -51,121 +51,121 @@ class Map(object):
         if self.complete:  # Game Over - Ignore Empty Board Updates
             return self
 
-        self._applyUpdateDiff(data)
-        self.scores = self._getScores(data)
+        self._apply_update_diff(data)
+        self.scores = self._get_scores(data)
         self.turn = data['turn']
 
         for x in range(self.cols):  # Update Each Tile
             for y in range(self.rows):
                 tile_type = self._tile_grid[y][x]
                 army_count = self._army_grid[y][x]
-                isCity = (y, x) in self._visible_cities
-                isGeneral = (y, x) in self._visible_generals
-                self.grid[y][x].update(self, tile_type, army_count, isCity, isGeneral)
+                is_city = (y, x) in self._visible_cities
+                is_general = (y, x) in self._visible_generals
+                self.grid[y][x].update(self, tile_type, army_count, is_city, is_general)
 
         return self
 
-    def updateResult(self, result):
+    def update_result(self, result):
         self.complete = True
         self.result = result == "game_won"
         return self
 
     # ======================== Map Search/Selection ======================== #
 
-    def find_city(self, ofType=None, notOfType=None, notInPath=None, findLargest=True, includeGeneral=False):
+    def find_city(self, of_type=None, not_of_type=None, not_in_path=None, find_largest=True, include_general=False):
         # ofType = Integer, notOfType = Integer, notInPath = [Tile], findLargest = Boolean
-        if notInPath is None:
-            notInPath = []
-        if ofType is None and notOfType is None:
-            ofType = self.player_index
+        if not_in_path is None:
+            not_in_path = []
+        if of_type is None and not_of_type is None:
+            of_type = self.player_index
 
         found_city = None
         for city in self.cities:  # Check Each City
-            if city.tile == ofType or (notOfType is not None and city.tile != notOfType):
-                if city in notInPath:
+            if city.tile == of_type or (not_of_type is not None and city.tile != not_of_type):
+                if city in not_in_path:
                     continue
                 if found_city is None:
                     found_city = city
-                elif (findLargest and found_city.army < city.army) or (not findLargest and city.army < found_city.army):
+                elif (find_largest and found_city.army < city.army) or (not find_largest and city.army < found_city.army):
                     found_city = city
 
-        if includeGeneral:
-            general = self.generals[ofType]
+        if include_general:
+            general = self.generals[of_type]
             if found_city is None:
                 return general
-            if general is not None and ((findLargest and general.army > found_city.army) or (
-                    not findLargest and general.army < found_city.army)):
+            if general is not None and ((find_largest and general.army > found_city.army) or (
+                    not find_largest and general.army < found_city.army)):
                 return general
 
         return found_city
 
-    def find_largest_tile(self, ofType=None, notInPath=None,
-                          includeGeneral=False):
+    def find_largest_tile(self, of_type=None, not_in_path=None,
+                          include_general=False):
         # ofType = Integer, notInPath = [Tile], includeGeneral = False|True|Int Acceptable Largest|0.1->0.9 Ratio
-        if notInPath is None:
-            notInPath = []
-        if ofType is None:
-            ofType = self.player_index
-        general = self.generals[ofType]
+        if not_in_path is None:
+            not_in_path = []
+        if of_type is None:
+            of_type = self.player_index
+        general = self.generals[of_type]
         if general is None:
             logging.error("ERROR: find_largest_tile encountered general=None for player %d with list %s" % (
-                ofType, self.generals))
+                of_type, self.generals))
 
         largest = None
-        for tile in self.tiles[ofType]:  # Check each ofType tile
+        for tile in self.tiles[of_type]:  # Check each ofType tile
             if largest is None or largest.army < tile.army:  # New largest
-                if not tile.isGeneral and tile not in notInPath:  # Exclude general and path
+                if not tile.is_general and tile not in not_in_path:  # Exclude general and path
                     largest = tile
 
-        if includeGeneral > 0 and general is not None and general not in notInPath:  # Handle includeGeneral
-            if includeGeneral < 1:
-                includeGeneral = general.army * includeGeneral
-                if includeGeneral < 6:
-                    includeGeneral = 6
+        if include_general > 0 and general is not None and general not in not_in_path:  # Handle includeGeneral
+            if include_general < 1:
+                include_general = general.army * include_general
+                if include_general < 6:
+                    include_general = 6
             if largest is None:
                 largest = general
-            elif includeGeneral and largest.army < general.army:
+            elif include_general and largest.army < general.army:
                 largest = general
-            elif includeGeneral > True and largest.army < general.army and largest.army <= includeGeneral:
+            elif include_general > True and largest.army < general.army and largest.army <= include_general:
                 largest = general
 
         return largest
 
     def find_primary_target(self, target=None):
         target_type = OPP_EMPTY - 1
-        if target is not None and target.shouldNotAttack():  # Acquired Target
+        if target is not None and target.should_not_attack():  # Acquired Target
             target = None
         if target is not None:  # Determine Previous Target Type
             target_type = OPP_EMPTY
-            if target.isGeneral:
+            if target.is_general:
                 target_type = OPP_GENERAL
-            elif target.isCity:
+            elif target.is_city:
                 target_type = OPP_CITY
             elif target.army > 0:
                 target_type = OPP_ARMY
 
         # Determine Max Target Size
-        largest = self.find_largest_tile(includeGeneral=True)
+        largest = self.find_largest_tile(include_general=True)
         max_target_size = largest.army * 1.25
 
         for x in _shuffle(range(self.cols)):  # Check Each Tile
             for y in _shuffle(range(self.rows)):
                 source = self.grid[y][x]
-                if not source.isValidTarget() or source.tile == self.player_index:  # Don't target invalid tiles
+                if not source.is_valid_target() or source.tile == self.player_index:  # Don't target invalid tiles
                     continue
 
                 if target_type <= OPP_GENERAL:  # Search for Generals
-                    if source.tile >= 0 and source.isGeneral and source.army < max_target_size:
+                    if source.tile >= 0 and source.is_general and source.army < max_target_size:
                         return source
 
                 if target_type <= OPP_CITY:  # Search for Smallest Cities
-                    if source.isCity and source.army < max_target_size:
+                    if source.is_city and source.army < max_target_size:
                         if target_type < OPP_CITY or source.army < target.army:
                             target = source
                             target_type = OPP_CITY
 
                 if target_type <= OPP_ARMY:  # Search for Largest Opponent Armies
-                    if source.tile >= 0 and (target is None or source.army > target.army) and not source.isCity:
+                    if source.tile >= 0 and (target is None or source.army > target.army) and not source.is_city:
                         target = source
                         target_type = OPP_ARMY
 
@@ -178,16 +178,16 @@ class Map(object):
 
     # ======================== Validators ======================== #
 
-    def isValidPosition(self, x, y):
+    def is_valid_position(self, x, y):
         return 0 <= y < self.rows and 0 <= x < self.cols and self._tile_grid[y][x] != TILE_MOUNTAIN
 
-    def canCompletePath(self, path):
+    def can_complete_path(self, path):
         if len(path) < 2:
             return False
 
         army_total = 0
         for tile in path:  # Verify can obtain every tile in path
-            if tile.isSwamp:
+            if tile.is_swamp:
                 army_total -= 1
 
             if tile.tile == self.player_index:
@@ -196,13 +196,13 @@ class Map(object):
                 return False
         return True
 
-    def canStepPath(self, path):
+    def can_step_path(self, path):
         if len(path) < 2:
             return False
 
         army_total = 0
         for tile in path:  # Verify can obtain at least one tile in path
-            if tile.isSwamp:
+            if tile.is_swamp:
                 army_total -= 1
 
             if tile.tile == self.player_index:
@@ -215,7 +215,7 @@ class Map(object):
 
     # ======================== PRIVATE FUNCTIONS ======================== #
 
-    def _getScores(self, data):
+    def _get_scores(self, data):
         scores = {s['i']: s for s in data['scores']}
         scores = [scores[i] for i in range(len(scores))]
 
@@ -224,7 +224,7 @@ class Map(object):
 
         return scores
 
-    def _applyUpdateDiff(self, data):
+    def _apply_update_diff(self, data):
         if '_map_private' not in dir(self):
             self._map_private = []
             self._cities_private = []
@@ -248,16 +248,16 @@ class Map(object):
         self._visible_generals = [(-1, -1) if g == -1 else (g // self.cols, g % self.cols) for g in
                                   data['generals']]  # returns [(y,x)]
 
-    def _setNeighbors(self):
+    def _set_neighbors(self):
         for x in range(self.cols):
             for y in range(self.rows):
-                self.grid[y][x].setNeighbors(self)
+                self.grid[y][x].set_neighbors(self)
 
-    def _setSwamps(self):
+    def _set_swamps(self):
         for (y, x) in self.swamps:
-            self.grid[y][x].setIsSwamp(True)
+            self.grid[y][x].set_is_swamp(True)
 
-    def _setGenerals(self):
+    def _set_generals(self):
         for i, general in enumerate(self._visible_generals):
             if general[0] != -1:
                 self.generals[i] = self.grid[general[0]][general[1]]

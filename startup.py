@@ -8,9 +8,9 @@ import argparse
 from base import bot_base
 
 
-def startup(moveMethod, moveEvent=None, botName="PurdueBot"):
+def startup(move_method, move_event=None, bot_name="PurdueBot"):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-name', metavar='str', type=str, default=os.environ.get('GENERALS_BOT_NAME', botName),
+    parser.add_argument('-name', metavar='str', type=str, default=os.environ.get('GENERALS_BOT_NAME', bot_name),
                         help='Name of Bot')
     parser.add_argument('-g', '--gameType', metavar='str', type=str, choices=["private", "1v1", "ffa"],
                         default=os.environ.get('GENERALS_BOT_MODE', 'private'), help='Game Type: private, 1v1, or ffa')
@@ -21,9 +21,9 @@ def startup(moveMethod, moveEvent=None, botName="PurdueBot"):
     parser.add_argument('--public', action='store_true', help="Run on public (not bot) server")
     args = vars(parser.parse_args())
 
-    if moveMethod is None:
+    if move_method is None:
         raise ValueError("A move method must be supplied upon startup")
 
-    bot_base.GeneralsBot(moveMethod, move_event=moveEvent, name=args['name'], game_type=args['gameType'],
+    bot_base.GeneralsBot(move_method, move_event=move_event, name=args['name'], game_type=args['gameType'],
                          private_room_id=args['roomID'], show_game_viewer=args['no_ui'], public_server=args['public'],
                          start_msg_cmd=args['command'])

@@ -18,10 +18,10 @@ _bot = None
 _map = None
 
 
-def make_move(currentBot, currentMap):
+def make_move(current_bot, current_map):
     global _bot, _map
-    _bot = currentBot
-    _map = currentMap
+    _bot = current_bot
+    _map = current_map
 
     # Make Move
     if _map.turn % 8 == 0:
@@ -59,20 +59,20 @@ _path_position = 0
 
 def update_primary_target():
     global _target
-    movesLeft = 100
-    pathLength = len(_map.path)
-    if pathLength > 2:
-        movesLeft = pathLength - _path_position - 1
+    moves_left = 100
+    path_length = len(_map.path)
+    if path_length > 2:
+        moves_left = path_length - _path_position - 1
 
     if _target is not None:  # Refresh Target Tile State
         _target = _map.grid[_target.y][_target.x]
-        if movesLeft <= 2:  # Make target appear smaller to avoid un-targeting # TEMP-FIX
+        if moves_left <= 2:  # Make target appear smaller to avoid un-targeting # TEMP-FIX
             _target.army = _target.army / 5
-    newTarget = _map.find_primary_target(_target)
+    new_target = _map.find_primary_target(_target)
 
-    if _target != newTarget:
-        _target = newTarget
-        new_primary_path(restoreOldPosition=True)
+    if _target != new_target:
+        _target = new_target
+        new_primary_path(restore_old_position=True)
 
 
 # ======================== Primary Path ======================== #
@@ -98,13 +98,13 @@ def move_primary_path_forward():
             return new_primary_path()
     except IndexError:
         # logging.debug("Path Error: Target Destination Out Of List Bounds")
-        return new_primary_path(restoreOldPosition=True)
+        return new_primary_path(restore_old_position=True)
 
     _path_position += 1
     return True
 
 
-def new_primary_path(restoreOldPosition=False):
+def new_primary_path(restore_old_position=False):
     global _bot, _path_position, _target
 
     # Store Old Tile
@@ -116,11 +116,11 @@ def new_primary_path(restoreOldPosition=False):
     # Determine Source and Path
     source = _map.find_city()
     if source is None:
-        source = _map.find_largest_tile(includeGeneral=True)
+        source = _map.find_largest_tile(include_general=True)
     _map.path = source.path_to(_target)  # Find new path to target
 
     # Restore Old Tile
-    if restoreOldPosition and old_tile is not None:
+    if restore_old_position and old_tile is not None:
         for i, tile in enumerate(_map.path):
             if (tile.x, tile.y) == (old_tile.x, old_tile.y):
                 _path_position = i
@@ -143,7 +143,7 @@ def move_outward():
 
 def find_collect_path():
     # Find Largest Tile
-    source = _map.find_largest_tile(notInPath=_map.path, includeGeneral=0.33)
+    source = _map.find_largest_tile(not_in_path=_map.path, include_general=0.33)
     if source is None or source.army < 4:
         _map.collect_path = []
         return _map.collect_path
@@ -177,4 +177,4 @@ def move_collect_to_path():
 # Start Game
 
 if __name__ == '__main__':
-    startup.startup(make_move, botName="PurdueBot-P2")
+    startup.startup(make_move, bot_name="PurdueBot-P2")

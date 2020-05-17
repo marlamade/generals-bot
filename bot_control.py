@@ -13,17 +13,17 @@ logging.basicConfig(level=logging.INFO)
 
 # ======================== Move Making ======================== #
 
-nextMove = []
+next_move = []
 last_manual = 0
 
 _bot = None
 _map = None
 
 
-def make_move(currentBot, currentMap):
+def make_move(current_bot, current_map):
     global _bot, _map, last_manual
-    _bot = currentBot
-    _map = currentMap
+    _bot = current_bot
+    _map = current_map
 
     if not move_priority():
         if not move_manual():
@@ -50,16 +50,16 @@ def add_next_move(source_xy, dest_xy):
     dest = _map.grid[dest_xy[1]][dest_xy[0]]
 
     move = (source, dest)
-    nextMove.append(move)
-    _bot._path = [t[1] for t in nextMove]
+    next_move.append(move)
+    _bot._path = [t[1] for t in next_move]
 
 
 def move_manual():
-    global nextMove, last_manual
-    if len(nextMove) == 0:
+    global next_move, last_manual
+    if len(next_move) == 0:
         return False
 
-    (source, dest) = nextMove.pop(0)
+    (source, dest) = next_move.pop(0)
     if source and dest:
         place_move(source, dest)
         return True
@@ -102,4 +102,4 @@ def move_toward():
 # Start Game
 
 if __name__ == '__main__':
-    startup.startup(make_move, moveEvent=add_next_move, botName="PurdueBot-H")
+    startup.startup(make_move, move_event=add_next_move, bot_name="PurdueBot-H")

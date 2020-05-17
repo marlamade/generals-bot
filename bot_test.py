@@ -20,12 +20,12 @@ _bot = None
 _map = None
 
 
-def make_move(currentBot, currentMap):
+def make_move(current_bot, current_map):
     global _bot, _map
-    _bot = currentBot
-    _map = currentMap
+    _bot = current_bot
+    _map = current_map
 
-    if _map.turn < 24 and currentBot._gameType != "private":
+    if _map.turn < 24 and current_bot._game_type != "private":
         return
 
     start_time = time.time()
@@ -81,4 +81,4 @@ def move_toward():
 # Start Game
 
 if __name__ == '__main__':
-    startup.startup(make_move, botName="PurdueBot-T")
+    startup.startup(make_move, bot_name="PurdueBot-T")

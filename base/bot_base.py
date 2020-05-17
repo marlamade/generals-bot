@@ -20,10 +20,10 @@ class GeneralsBot(object):
     def __init__(self, move_method, move_event=None, name="PurdueBot", game_type="private", private_room_id=None,
                  show_game_viewer=True, public_server=False, start_msg_cmd=""):
         # Save Config
-        self._moveMethod = move_method
+        self._move_method = move_method
         self._name = name
-        self._gameType = game_type
-        self._privateRoomID = private_room_id
+        self._game_type = game_type
+        self._private_roomID = private_room_id
         self._public_server = public_server
         self._start_msg_cmd = start_msg_cmd
 
@@ -36,11 +36,11 @@ class GeneralsBot(object):
 
         # Start Game Viewer
         if show_game_viewer:
-            window_title = "%s (%s)" % (self._name, self._gameType)
-            if self._privateRoomID is not None:
-                window_title = "%s (%s - %s)" % (self._name, self._gameType, self._privateRoomID)
-            self._viewer = GeneralsViewer(window_title, moveEvent=move_event)
-            self._viewer.mainViewerLoop()  # Consumes Main Thread
+            window_title = "%s (%s)" % (self._name, self._game_type)
+            if self._private_roomID is not None:
+                window_title = "%s (%s - %s)" % (self._name, self._game_type, self._private_roomID)
+            self._viewer = GeneralsViewer(window_title, move_event=move_event)
+            self._viewer.main_viewer_loop()  # Consumes Main Thread
             self._exit_game()
 
         while self._running:
@@ -52,7 +52,7 @@ class GeneralsBot(object):
 
     def _start_game_thread(self):
         # Create Game
-        self._game = generals.Generals(self._name, self._name, self._gameType, gameid=self._privateRoomID,
+        self._game = generals.Generals(self._name, self._name, self._game_type, gameid=self._private_roomID,
                                        public_server=self._public_server)
         _create_thread(self._send_start_msg_cmd)
 
@@ -72,8 +72,8 @@ class GeneralsBot(object):
         # Update GeneralsViewer Grid
         if '_viewer' in self_dir:
             if '_moves_realized' in self_dir:
-                self._map.bottomText = "Realized: " + str(self._moves_realized)
-            viewer = self._viewer.updateGrid(game_map)
+                self._map.bottom_text = "Realized: " + str(self._moves_realized)
+            viewer = self._viewer.update_grid(game_map)
 
         # Handle Game Complete
         if game_map.complete and not self._has_completed:
@@ -101,7 +101,7 @@ class GeneralsBot(object):
             self._moves_realized += 1
 
     def _make_move(self):
-        self._moveMethod(self, self._map)
+        self._move_method(self, self._map)
 
     # ======================== Chat Messages ======================== #
 
@@ -121,7 +121,7 @@ class GeneralsBot(object):
     # ======================== Move Making ======================== #
 
     def place_move(self, source, dest, move_half=False):
-        if self._map.isValidPosition(dest.x, dest.y):
+        if self._map.is_valid_position(dest.x, dest.y):
             self._game.move(source.y, source.x, dest.y, dest.x, move_half)
             if SHOULD_DIRTY_MAP_ON_MOVE:
                 self._update_map_dirty(source, dest, move_half)
@@ -132,14 +132,14 @@ class GeneralsBot(object):
         army = source.army if not move_half else source.army / 2
         source.update(self._map, source.tile, 1)
 
-        if dest.isOnTeam():  # Moved Internal Tile
+        if dest.is_on_team():  # Moved Internal Tile
             dest_army = army - 1 + dest.army
-            dest.update(self._map, source.tile, dest_army, isDirty=True)
+            dest.update(self._map, source.tile, dest_army, is_dirty=True)
             return True
 
         elif army > dest.army + 1:  # Captured Tile
             dest_army = army - 1 - dest.army
-            dest.update(self._map, source.tile, dest_army, isCity=dest.isGeneral, isDirty=True)
+            dest.update(self._map, source.tile, dest_army, is_city=dest.is_general, is_dirty=True)
             return True
         return False
 

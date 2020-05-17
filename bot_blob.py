@@ -73,4 +73,4 @@ def move_toward():
 # Start Game
 
 if __name__ == '__main__':
-    startup.startup(make_move, botName="PurdueBot-B2")
+    startup.startup(make_move, bot_name="PurdueBot-B2")

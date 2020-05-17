@@ -42,8 +42,8 @@ class BotCommands(object):
 
         return msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username
 
-    def handle_command(self, msg, isFromChat=False, username=""):
-        command_list = self._get_command(msg, isFromChat, username)
+    def handle_command(self, msg, is_from_chat=False, username=""):
+        command_list = self._get_command(msg, is_from_chat, username)
 
         if self._handle_start_command(command_list):
             return True
@@ -60,11 +60,11 @@ class BotCommands(object):
         return False
 
     def _handle_start_command(self, commandlist):
-        (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = commandlist
+        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = commandlist
 
         if len(msg) < 12 and any(k in msg_lower for k in START_KEYWORDS):
             self._bot.send_forcestart(delay=0)
-            self._bot.isPaused = False
+            self._bot.is_paused = False
             return True
         if len(msg) < 2:
             return True
@@ -72,12 +72,12 @@ class BotCommands(object):
         return False
 
     def _handle_chat_command(self, commandlist):
-        (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = commandlist
+        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = commandlist
 
         if self._handle_player_command(msg, username):
             return True
         if base_command.startswith(tuple(HELP_KEYWORDS)):
-            self._print_command_help(isFromChat)
+            self._print_command_help(is_from_chat)
             return True
         if base_command.startswith(tuple(HELLO_KEYWORDS)):
             self._print_command_hello()
@@ -86,7 +86,7 @@ class BotCommands(object):
         return False
 
     def _handle_unrestricted_command(self, commandlist):
-        (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = commandlist
+        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = commandlist
 
         if "setup" in base_command:
             self._bot.set_game_speed(4)
@@ -103,7 +103,7 @@ class BotCommands(object):
         return False
 
     def _handle_restricted_command(self, command_list):
-        (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = command_list
+        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = command_list
 
         if self._permitted_username != "" and self._permitted_username != username:  # Only allow permitted user
             return False
@@ -117,7 +117,7 @@ class BotCommands(object):
         return False
 
     def _handle_setup_command(self, command_list):
-        (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = command_list
+        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = command_list
 
         if "map" in base_command:
             if command_len >= 2:
@@ -194,14 +194,14 @@ class BotCommands(object):
                     pass
             self._set_swamp_map()
             return True
-        elif isFromChat and len(msg) < 12 and "map" in msg_lower:
+        elif is_from_chat and len(msg) < 12 and "map" in msg_lower:
             self._set_game_map()
             return True
 
         return False
 
     def _handle_game_command(self, commandlist):
-        (msg, msg_lower, command, command_len, base_command, arg_command, isFromChat, username) = commandlist
+        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = commandlist
 
         if "take" in base_command and username != "":
             self._permitted_username = username
@@ -227,10 +227,10 @@ class BotCommands(object):
             return True
 
         elif "unpause" in base_command:
-            self._bot.isPaused = False
+            self._bot.is_paused = False
             return True
         elif "pause" in base_command:
-            self._bot.isPaused = True
+            self._bot.is_paused = True
             return True
 
         return False

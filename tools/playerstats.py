@@ -22,7 +22,7 @@ def mapstats(playername):
     maps = {}
     for replay in replays:
         if replay['type'] == "custom":
-            mapName = _get_map_name(replay['id'])
+            map_name = _get_map_name(replay['id'])
 
 
 def opponentstats(playername, mingames=0):
@@ -31,20 +31,20 @@ def opponentstats(playername, mingames=0):
     opponents = {}
     for replay in replays:
         if replay['type'] == "custom":
-            didBeatPlayer = True
+            did_beat_player = True
             for opponent in replay['ranking']:
                 name = opponent['name']
                 if not _is_valid_name(name):
                     continue
                 if name != playername:
                     if name not in opponents:
-                        opponents[name] = {"games": 1, "wins": (1 if didBeatPlayer else 0)}
+                        opponents[name] = {"games": 1, "wins": (1 if did_beat_player else 0)}
                     else:
                         opponents[name]['games'] += 1
-                        if didBeatPlayer:
+                        if did_beat_player:
                             opponents[name]['wins'] += 1
                 else:
-                    didBeatPlayer = False
+                    did_beat_player = False
 
     opponents_selected = {}
     for (name, opponent) in opponents.items():
