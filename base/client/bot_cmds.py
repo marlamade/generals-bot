@@ -59,8 +59,8 @@ class BotCommands(object):
 
         return False
 
-    def _handle_start_command(self, commandlist):
-        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = commandlist
+    def _handle_start_command(self, command_list):
+        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = command_list
 
         if len(msg) < 12 and any(k in msg_lower for k in START_KEYWORDS):
             self._bot.send_forcestart(delay=0)
@@ -71,8 +71,8 @@ class BotCommands(object):
 
         return False
 
-    def _handle_chat_command(self, commandlist):
-        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = commandlist
+    def _handle_chat_command(self, command_list):
+        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = command_list
 
         if self._handle_player_command(msg, username):
             return True
@@ -85,8 +85,8 @@ class BotCommands(object):
 
         return False
 
-    def _handle_unrestricted_command(self, commandlist):
-        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = commandlist
+    def _handle_unrestricted_command(self, command_list):
+        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = command_list
 
         if "setup" in base_command:
             self._bot.set_game_speed(4)
@@ -200,8 +200,8 @@ class BotCommands(object):
 
         return False
 
-    def _handle_game_command(self, commandlist):
-        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = commandlist
+    def _handle_game_command(self, command_list):
+        (msg, msg_lower, command, command_len, base_command, arg_command, is_from_chat, username) = command_list
 
         if "take" in base_command and username != "":
             self._permitted_username = username
@@ -294,25 +294,25 @@ class BotCommands(object):
 
     # ======================== Set Custom Gamemap ======================== #
 
-    def _set_game_map(self, mapname=""):
-        if len(mapname) > 1:
-            maplower = mapname.lower()
-            if maplower in ["win", "good"]:
+    def _set_game_map(self, map_name=""):
+        if len(map_name) > 1:
+            map_lower = map_name.lower()
+            if map_lower in ["win", "good"]:
                 self._bot.set_game_map(random.choice(GENERALS_MAPS))
-            elif maplower == "top":
+            elif map_lower == "top":
                 self._bot.set_game_map(random.choice(generals_api.list_top()))
-            elif maplower == "hot":
+            elif map_lower == "hot":
                 self._bot.set_game_map(random.choice(generals_api.list_hot()))
             else:
-                maps = generals_api.list_search(mapname)
-                if mapname in maps:
-                    self._bot.set_game_map(mapname)
+                maps = generals_api.list_search(map_name)
+                if map_name in maps:
+                    self._bot.set_game_map(map_name)
                 elif len(maps) >= 1:
                     self._bot.set_game_map(maps[0])
-                    self._bot.send_chat("I could not find " + mapname + ", so I set the map to " + maps[
+                    self._bot.send_chat("I could not find " + map_name + ", so I set the map to " + maps[
                         0] + " (Note: names are case sensitive)")
                 else:
-                    self._bot.send_chat("Could not find map named " + mapname + " (Note: names are case sensitive)")
+                    self._bot.send_chat("Could not find map named " + map_name + " (Note: names are case sensitive)")
         else:
             self._bot.set_game_map(random.choice(generals_api.list_both()))
 
@@ -326,7 +326,7 @@ class BotCommands(object):
     def _set_swamp_map(self, swamp=-1):
         if swamp == -1:
             swamp = round(random.uniform(0, 1), 2)
-        if swamp >= 0 and swamp <= 1:
+        if 0 <= swamp <= 1:
             self._bot.set_normal_map(swamp=swamp)
 
     # ======================== Player Requested Commands ======================== #
@@ -334,10 +334,6 @@ class BotCommands(object):
     def _handle_player_command(self, msg, username):
         if "boomer" in username.lower():
             self._bot.send_chat("Okay Boomer <3")
-            return True
-
-        if "hitler" in username.lower():
-            self._bot.send_chat("I dont like your name :(")
             return True
 
         return False

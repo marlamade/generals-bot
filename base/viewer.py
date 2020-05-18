@@ -119,7 +119,7 @@ class GeneralsViewer(object):
             elif pos[0] < TOGGLE_GRID_BTN_WIDTH + TOGGLE_EXIT_BTN_WIDTH:  # Toggle Exit on Game Over
                 self._map.exit_on_game_over = not self._map.exit_on_game_over
             self._received_update = True
-        elif self._show_grid and pos[1] > ABOVE_GRID_HEIGHT and pos[1] < (
+        elif self._show_grid and ABOVE_GRID_HEIGHT < pos[1] < (
                 self._window_size[1] - SCORES_ROW_HEIGHT):  # Click inside Grid
             column = pos[0] // (CELL_WIDTH + CELL_MARGIN)
             row = (pos[1] - ABOVE_GRID_HEIGHT) // (CELL_HEIGHT + CELL_MARGIN)

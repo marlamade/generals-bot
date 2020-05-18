@@ -43,9 +43,9 @@ def list_search(query):
 def _get_list_maps(url):
     data = _get_url(url)
     maps = []
-    for custommap in data:
-        if _is_valid_name(custommap['title']):
-            maps.append(custommap['title'])
+    for custom_map in data:
+        if _is_valid_name(custom_map['title']):
+            maps.append(custom_map['title'])
     return maps
 
 

@@ -6,8 +6,11 @@
 
 SHOULD_DIRTY_MAP_ON_MOVE = True
 
+# noinspection SpellCheckingInspection,SpellCheckingInspection
 ENDPOINT_BOT = "ws://botws.generals.io/socket.io/?EIO=3&transport=websocket"
+# noinspection SpellCheckingInspection
 ENDPOINT_PUBLIC = "ws://ws.generals.io/socket.io/?EIO=3&transport=websocket"
+# noinspection SpellCheckingInspection
 BOT_KEY = "sd09fjd203i0ejwi"
 
 REPLAY_URLS = {
@@ -58,6 +61,7 @@ PRE_HELP_TEXT = [
     "| swamp 0.5: set swamp value for normal map",
     "| Code available at: git.io/myssix",
 ]
+# noinspection SpellCheckingInspection,SpellCheckingInspection
 GAME_HELP_TEXT = [
     "| ======= Available Commands =======",
     "| team: request not to be attacked",

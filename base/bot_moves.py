@@ -24,7 +24,7 @@ def move_priority(game_map):
                     if not priority_move[0] or priority_move[0].army < neighbor.army:
                         priority_move = (neighbor, tile)
             if priority_move[0]:
-                # TODO: Note, priority moves are repeatedly sent, indiating move making is sending repeated moves
+                # TODO: Note, priority moves are repeatedly sent, indicating move making is sending repeated moves
                 # logging.info("Priority Move from %s -> %s" % (priority_move[0], priority_move[1]))
                 break
     return priority_move
@@ -113,10 +113,11 @@ def should_move_half(game_map, source, dest=None):
     return False
 
 
-# ======================== Proximity Targeting - Pathfinding ======================== #
+# ======================== Proximity Targeting - Path-finding ======================== #
 
+# noinspection SpellCheckingInspection
 def path_proximity_target(game_map):
-    # Find path from largest tile to closest target
+    # Find path from largest tile to closest targetbasic_config
     source = game_map.find_largest_tile(include_general=0.5)
     target = source.nearest_target_tile()
     path = source.path_to(target)
@@ -128,6 +129,7 @@ def path_proximity_target(game_map):
     return path
 
 
+# noinspection SpellCheckingInspection,SpellCheckingInspection
 def path_gather(game_map, elso_do=None):
     if elso_do is None:
         elso_do = []

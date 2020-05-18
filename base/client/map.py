@@ -86,7 +86,8 @@ class Map(object):
                     continue
                 if found_city is None:
                     found_city = city
-                elif (find_largest and found_city.army < city.army) or (not find_largest and city.army < found_city.army):
+                elif (find_largest and found_city.army < city.army) or \
+                        (not find_largest and city.army < found_city.army):
                     found_city = city
 
         if include_general:

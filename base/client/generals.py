@@ -129,9 +129,9 @@ class Generals(object):
                 self.teams[msg['teams'][i]].append(msg['usernames'][i])
 
         if 'map_title' in msg:
-            mapname = msg['map_title']
-            if mapname and len(mapname) > 1:
-                logging.info("Queue [%s] %d/%d %s" % (mapname, msg['numForce'], msg['numPlayers'], self.teams))
+            map_name = msg['map_title']
+            if map_name and len(map_name) > 1:
+                logging.info("Queue [%s] %d/%d %s" % (map_name, msg['numForce'], msg['numPlayers'], self.teams))
                 return
 
         logging.info("Queue %d/%d %s" % (msg['numForce'], msg['numPlayers'], self.teams))
@@ -220,21 +220,21 @@ class Generals(object):
     def set_game_public(self):
         self._send(["make_custom_public", self._gameid])
 
-    def set_game_map(self, mapname=""):
-        if len(mapname) > 1:
-            self._send(["set_custom_options", self._gameid, {"map": mapname}])
+    def set_game_map(self, map_name=""):
+        if len(map_name) > 1:
+            self._send(["set_custom_options", self._gameid, {"map": map_name}])
 
     def set_normal_map(self, width=-1, height=-1, city=-1, mountain=-1, swamp=-1):
         self._send(["set_custom_options", self._gameid, {"map": None}])
-        if width >= 0 and width <= 1:
+        if 0 <= width <= 1:
             self._send(["set_custom_options", self._gameid, {"width": width}])
-        if height >= 0 and height <= 1:
+        if 0 <= height <= 1:
             self._send(["set_custom_options", self._gameid, {"height": height}])
-        if city >= 0 and city <= 1:
+        if 0 <= city <= 1:
             self._send(["set_custom_options", self._gameid, {"city_density": city}])
-        if mountain >= 0 and mountain <= 1:
+        if 0 <= mountain <= 1:
             self._send(["set_custom_options", self._gameid, {"mountain_density": mountain}])
-        if swamp >= 0 and swamp <= 1:
+        if 0 <= swamp <= 1:
             self._send(["set_custom_options", self._gameid, {"swamp_density": swamp}])
 
     def send_surrender(self):

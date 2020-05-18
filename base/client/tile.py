@@ -51,7 +51,8 @@ class Tile(object):
         if is_dirty:
             self._dirty_update_time = time.time()
 
-        if self.tile < 0 or tile >= TILE_MOUNTAIN or (tile < TILE_MOUNTAIN and self.is_self()):  # Tile should be updated
+        if self.tile < 0 or tile >= TILE_MOUNTAIN or (tile < TILE_MOUNTAIN and self.is_self()):
+            # Tile should be updated
             if (tile >= 0 or self.tile >= 0) and self.tile != tile:  # Remember Discovered Tiles
                 self.turn_captured = game_map.turn
                 if self.tile >= 0:
