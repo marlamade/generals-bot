@@ -224,6 +224,7 @@ class Tile(object):
         frontier.put(self)
         came_from = {self: None}
         army_count = {self: self.army}
+        processed = set()
 
         while not frontier.empty():
             current = frontier.get()
@@ -232,14 +233,19 @@ class Tile(object):
                 break
 
             for next in current.neighbors(include_swamps=True, include_cities=include_cities):
-                if next not in came_from and (next.is_on_team() or next == dest or next.army < army_count[current]):
+                if next not in processed and (next.is_on_team() or next == dest or next.army < army_count[current]):
                     # priority = self.distance(next, dest)
-                    frontier.put(next)
-                    came_from[next] = current
+                    if next not in came_from:
+                        frontier.put(next)
                     if next.is_on_team():
-                        army_count[next] = army_count[current] + (next.army - 1)
+                        next_army_count = army_count[current] + (next.army - 1)
                     else:
-                        army_count[next] = army_count[current] - (next.army + 1)
+                        next_army_count = army_count[current] - (next.army + 1)
+                    if next not in army_count or next_army_count > army_count[next]:
+                        army_count[next] = next_army_count
+                        came_from[next] = current
+
+            processed.add(current)
 
         if dest not in came_from:  # Did not find dest
             if include_cities:
