@@ -8,7 +8,7 @@ import argparse
 from base import bot_base
 
 
-def startup(move_method, move_event=None, bot_name="PurdueBot"):
+def startup(move_method, move_event=None, bot_name="Brobot"):
     parser = argparse.ArgumentParser()
     parser.add_argument('-name', metavar='str', type=str, default=os.environ.get('GENERALS_BOT_NAME', bot_name),
                         help='Name of Bot')

@@ -27,7 +27,7 @@ def make_move(current_bot, current_map):
 
     if _map.turn % 3 == 0:
         if move_outward():
-            return True
+            return
     if not move_toward():
         move_outward()
     return
@@ -73,4 +73,4 @@ def move_toward():
 # Start Game
 
 if __name__ == '__main__':
-    startup.startup(make_move, bot_name="PurdueBot-B2")
+    startup.startup(make_move, bot_name="Brobot")

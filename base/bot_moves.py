@@ -18,7 +18,7 @@ def move_priority(game_map):
     generals_and_cities.extend(game_map.cities)
 
     for tile in generals_and_cities:
-        if not tile.should_not_attack():
+        if tile.should_attack():
             for neighbor in tile.neighbors():
                 if neighbor.is_self() and neighbor.army > max(1, tile.army + 1):
                     if not priority_move[0] or priority_move[0].army < neighbor.army:
@@ -118,6 +118,8 @@ def should_move_half(game_map, source, dest=None):
 # noinspection SpellCheckingInspection
 def path_proximity_target(game_map):
     # Find path from largest tile to closest targetbasic_config
+
+    # find the tile I own with the most armies. Include generals at .5 of their actual armies
     source = game_map.find_largest_tile(include_general=0.5)
     target = source.nearest_target_tile()
     path = source.path_to(target)
@@ -134,7 +136,7 @@ def path_gather(game_map, elso_do=None):
     if elso_do is None:
         elso_do = []
     target = game_map.find_largest_tile()
-    source = game_map.find_largest_tile(not_in_path=[target], include_general=0.5)
+    source = game_map.find_largest_tile(tiles_to_exclude=[target], include_general=0.5)
     if source and target and source != target:
         return source.path_to(target)
     return elso_do

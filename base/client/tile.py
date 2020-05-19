@@ -97,11 +97,13 @@ class Tile(object):
         return neighbors
 
     def is_valid_target(self):  # Check tile to verify reachability
-        if self.tile < TILE_EMPTY:
+        if self.tile in (TILE_MOUNTAIN, TILE_FOG, TILE_OBSTACLE):
             return False
         for tile in self.neighbors(include_swamps=True):
             if tile.turn_held > 0:
                 return True
+        # one way to get here is if there is an empty tile in a separate connected component
+        # that is visible at a diagonal. Are there other ways to get here?
         return False
 
     def is_empty(self):
@@ -120,6 +122,7 @@ class Tile(object):
 
     def should_attack(self):
         if not self.is_valid_target():
+            # Target is a mountain or is not verified to be in my connected component.
             return False
         if self.is_on_team():
             return False
@@ -144,7 +147,8 @@ class Tile(object):
                 if not neighbor.is_swamp:
                     if target is None:
                         target = neighbor
-                    elif neighbor.is_city and (not target.is_city or target.army > neighbor.army):
+                    elif neighbor.is_city and (not target.is_city or target.army > neighbor.army) and \
+                            (neighbor.unknown_neighbor_count() > 0 or neighbor.army < self.army * 2) :
                         target = neighbor
                     # Special case, prioritize opponents with 1 army over empty tiles
                     elif not neighbor.is_empty and neighbor.army <= 1 and target.is_empty:
@@ -175,6 +179,7 @@ class Tile(object):
 
     def nearest_target_tile(self):
         if not self.is_self():
+            # if the player doesn't own this tile
             return None
 
         max_target_army = self.army * 4 + 14
@@ -192,13 +197,14 @@ class Tile(object):
                 if tile.is_general:  # Generals appear closer
                     distance = distance * 0.09
                 elif tile.is_city:  # Cities vary distance based on size, but appear closer
-                    distance = distance * sorted((0.17, (tile.army / (3.2 * self.army)), 20))[1]
+                    # distance = distance * sorted((0.17, (tile.army / (3.2 * self.army)), 20))[1]
+                    distance *= 0.3
 
-                if tile.tile == TILE_EMPTY:  # Empties appear further away
-                    if tile.is_city:
-                        distance = distance * 1.6
-                    else:
-                        distance = distance * 4.3
+                # if tile.tile == TILE_EMPTY:  # Empties appear further away
+                #     if tile.is_city:
+                #         distance = distance * 1.6
+                #     else:
+                #         distance = distance * 4.3
 
                 if tile.army > self.army:  # Larger targets appear further away
                     distance = distance * (1.6 * tile.army / self.army)
@@ -208,11 +214,26 @@ class Tile(object):
                     if tile.turn_held > 0:  # Swamps which have been held appear even further away
                         distance = distance * 3
 
+                # Tiles with unknown neighbors appear closer
+                distance *= 4 - tile.unknown_neighbor_count() * 1
+                distance *= 4 - tile.unknown_neighbor_count() * 1
+
                 if distance < dest_distance:  # ----- Set nearest target -----
                     dest = tile
                     dest_distance = distance
-
+        if dest is None:
+            print("Tile", self.x, self.y, ": No Targets")
+        else:
+            print("Tile", self.x, self.y, ": Targeting tile", dest.x, dest.y,
+                  "Neighbor cnt: ", dest.unknown_neighbor_count(),
+                  "Neighbors: ", [(neighbor.x, neighbor.y, neighbor.tile) for neighbor in dest._neighbors])
         return dest
+
+    def unknown_neighbor_count(self):
+        return sum(
+            1 for neighbor in self._neighbors
+            if neighbor.tile in (TILE_FOG, TILE_OBSTACLE)
+        )
 
     # ======================== Pathfinding ======================== #
 

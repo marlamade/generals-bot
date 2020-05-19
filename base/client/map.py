@@ -5,6 +5,7 @@
 """
 
 import logging
+from typing import List
 
 from .constants import *
 from .tile import Tile
@@ -100,11 +101,24 @@ class Map(object):
 
         return found_city
 
-    def find_largest_tile(self, of_type=None, not_in_path=None,
-                          include_general=False):
+    def find_largest_tile(
+            self,
+            of_type: int = None,
+            tiles_to_exclude: List[Tile] = None,
+            include_general=False
+    ):
+        """
+
+        :param of_type: the player who's tiles are under consideration
+        :param tiles_to_exclude:
+        :param include_general: if 0, don't include the general. if 1, include the general.
+            If between 0 and 1, multiply the general's army by this number and then include it.
+            If greater than 1, include the general only if all other armies are less than this number.
+        :return: The tile belonging to player of_type with the most armies
+        """
         # ofType = Integer, notInPath = [Tile], includeGeneral = False|True|Int Acceptable Largest|0.1->0.9 Ratio
-        if not_in_path is None:
-            not_in_path = []
+        if tiles_to_exclude is None:
+            tiles_to_exclude = []
         if of_type is None:
             of_type = self.player_index
         general = self.generals[of_type]
@@ -115,19 +129,19 @@ class Map(object):
         largest = None
         for tile in self.tiles[of_type]:  # Check each ofType tile
             if largest is None or largest.army < tile.army:  # New largest
-                if not tile.is_general and tile not in not_in_path:  # Exclude general and path
+                if not tile.is_general and tile not in tiles_to_exclude:  # Exclude general and path
                     largest = tile
 
-        if include_general > 0 and general is not None and general not in not_in_path:  # Handle includeGeneral
+        if include_general > 0 and general is not None and general not in tiles_to_exclude:  # Handle includeGeneral
             if include_general < 1:
                 include_general = general.army * include_general
                 if include_general < 6:
                     include_general = 6
             if largest is None:
                 largest = general
-            elif include_general and largest.army < general.army:
+            elif include_general == 1 and largest.army < general.army:
                 largest = general
-            elif include_general > True and largest.army < general.army and largest.army <= include_general:
+            elif include_general > 1 and largest.army < general.army and largest.army <= include_general:
                 largest = general
 
         return largest
