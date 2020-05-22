@@ -143,6 +143,11 @@ class GeneralsBot(object):
             return True
         return False
 
+    # ======================== Properties ======================== #
+
+    @property
+    def neighbors(self):
+        return self._neighbors
 
 # ======================== Global Helpers ======================== #
 

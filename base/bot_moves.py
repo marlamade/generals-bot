@@ -14,14 +14,20 @@ from .client.constants import *
 
 def move_priority(game_map):
     priority_move = (False, False)
-    generals_and_cities = [t for t in game_map.generals if t is not None]
-    generals_and_cities.extend(game_map.cities)
+    generals = [t for t in game_map.generals if t is not None]
+    generals_and_cities = generals + game_map.cities
 
     for tile in generals_and_cities:
+        # if it doesn't belong to my teammates and isn't dirty
         if tile.should_attack():
             for neighbor in tile.neighbors():
+                # if I can capture this tile
                 if neighbor.is_self() and neighbor.army > max(1, tile.army + 1):
+                    # if I haven't already found a priority move OR I have, but it uses a weaker army
                     if not priority_move[0] or priority_move[0].army < neighbor.army:
+                        priority_move = (neighbor, tile)
+                    # if the tile is a general, capture it
+                    if tile in generals:
                         priority_move = (neighbor, tile)
             if priority_move[0]:
                 # TODO: Note, priority moves are repeatedly sent, indicating move making is sending repeated moves
@@ -33,6 +39,12 @@ def move_priority(game_map):
 # ======================== Move Outward ======================== #
 
 def move_outward(game_map, path=None):
+    """
+    Move from one of my tiles to any adjacent tile, preferably not a swamp
+    :param game_map:
+    :param path:
+    :return:
+    """
     if path is None:
         path = []
     move_swamp = (False, False)
@@ -121,6 +133,8 @@ def path_proximity_target(game_map):
 
     # find the tile I own with the most armies. Include generals at .5 of their actual armies
     source = game_map.find_largest_tile(include_general=0.5)
+    # find the best enemy target to attack. If all enemy tiles have more that 4x+14 army, where x
+    # is the size of my largest army, then return none.
     target = source.nearest_target_tile()
     path = source.path_to(target)
     # logging.info("Proximity %s -> %s via %s" % (source, target, path))

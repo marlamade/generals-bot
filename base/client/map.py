@@ -17,6 +17,7 @@ class Map(object):
         self._start_data = start_data
         self.player_index = start_data['playerIndex']  # Integer Player Index
         self.usernames = start_data['usernames']  # List of String Usernames
+        self.my_team = self._get_my_team(start_data['teams'])
         # TODO: Use Client Region
         self.replay_url = REPLAY_URLS["na"] + start_data['replay_id']  # String Replay URL
 
@@ -240,11 +241,19 @@ class Map(object):
         return scores
 
     def _apply_update_diff(self, data):
+        print_cities = data['turn'] % 30 == 0
         if '_map_private' not in dir(self):
             self._map_private = []
             self._cities_private = []
+        if print_cities:
+            print("Turn", data['turn'])
+            print(self._cities_private)
+            print(data['cities_diff'])
         _apply_diff(self._map_private, data['map_diff'])
         _apply_diff(self._cities_private, data['cities_diff'])
+        if print_cities:
+            print(self._cities_private)
+            print("\n")
 
         # Get Number Rows + Columns
         self.rows, self.cols = self._map_private[1], self._map_private[0]
@@ -277,12 +286,33 @@ class Map(object):
             if general[0] != -1:
                 self.generals[i] = self.grid[general[0]][general[1]]
 
+    def _get_my_team(self, team_list):
+        return [
+            player_id
+            for player_id, team in enumerate(team_list)
+            if team == team_list[self.player_index]
+        ]
 
 def _apply_diff(cache, diff):
-    i = 0
-    a = 0
+    """
+    Input from generals.io assumes you are storing all data in arrays: one array
+    describing most of the board state, and a second array just listing the cities.
+    Updates from generals.io comes in the form of a diff array which has the following format:
+    [u0, n0, x00, x01, ..., x0{n0-1}, u1, n1, x10, x11, x12, ..., x1{n1-1}, ... uk, ..., xk{nk-1}, u{k+1}?]
+    Where u0 is the number of initial entries that do not need to change, n0 is the length of the first
+    section that needs to change, [x00, ..., x0{n0-1}] are the new values for those entries, u1 is the
+    number of entries after that that do not need to change, etc. If there is stuff at the end that does
+    not need to change, the array will end with a u{k+1}
+    :param cache: a "passed by reference" array that we are going to modify with this diff
+    :param diff: the diff from the file.
+    :return:
+    """
+    i = 0  # the current index of the diff array
+    a = 0  # the current index of the cache array
     while i < len(diff) - 1:
-        # offset and length
+        # diff[i] = the number of entries that do not need to change (u)
+        # diff[i+1] =  the number of entries that do need to change (n)
+        # diff[i+2:i+2+n] = the new values (x)
         a += diff[i]
         n = diff[i + 1]
 
@@ -291,6 +321,8 @@ def _apply_diff(cache, diff):
         i += n + 2
 
     if i == len(diff) - 1:
+        # if there is a u{k+1} at the end, we go u{k+1} entries more and then truncate the rest of
+        # the array. This statement should never have any affect.
         cache[:] = cache[:a + diff[i]]
         i += 1
 

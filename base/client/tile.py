@@ -19,6 +19,7 @@ class Tile(object):
         self.tile = TILE_FOG  # Integer Tile Type (TILE_OBSTACLE, TILE_FOG, TILE_MOUNTAIN, TILE_EMPTY, or player_ID)
         self.turn_captured = 0  # Integer Turn Tile Last Captured
         self.turn_held = 0  # Integer Last Turn Held
+        self.turn_first_seen = 0 # First turn the tile was visible to us
         self.army = 0  # Integer Army Count
         self.is_city = False  # Boolean isCity
         self.is_swamp = False  # Boolean isSwamp
@@ -28,6 +29,7 @@ class Tile(object):
         self._map = game_map  # Pointer to Map Object
         self._general_index = -1  # Player Index if tile is a general
         self._dirty_update_time = 0  # Last time Tile was updated by bot, not server
+        self._is_main_force = False
 
     def __repr__(self):
         return "(%2d,%2d)[%2d,%3d]" % (self.x, self.y, self.tile, self.army)
@@ -78,6 +80,13 @@ class Tile(object):
             game_map.generals[tile] = self
             self._general_index = self.tile
 
+        if self.turn_first_seen == 0 and tile not in (TILE_FOG, TILE_OBSTACLE):
+            self.turn_first_seen = self._map.turn
+
+        if self.tile != self._map.player_index:
+            self._is_main_force = False
+
+
     # ======================== Tile Properties ======================== #
 
     def is_dirty(self):
@@ -113,14 +122,17 @@ class Tile(object):
         return self.tile == self._map.player_index
 
     def is_on_team(self):
-        if self.is_self():
-            return True
-        return False
+        return self.tile in self._map.my_team
 
     def should_not_attack(self):  # DEPRECATED: Use Tile.shouldAttack
         return not self.should_attack()
 
     def should_attack(self):
+        """
+        Checks that this tile is visible, not a mountain, in my connected component,
+        does not belong to a teammate, and is not dirty.
+        :return:
+        """
         if not self.is_valid_target():
             # Target is a mountain or is not verified to be in my connected component.
             return False
@@ -190,7 +202,7 @@ class Tile(object):
             for y in range(self._map.rows):
                 tile = self._map.grid[y][x]
                 # Non Target Tiles
-                if not tile.is_valid_target() or tile.should_not_attack() or tile.army > max_target_army:
+                if not tile.is_valid_target() or not tile.should_attack() or tile.army > max_target_army:
                     continue
 
                 distance = self.distance_to(tile)
@@ -221,12 +233,12 @@ class Tile(object):
                 if distance < dest_distance:  # ----- Set nearest target -----
                     dest = tile
                     dest_distance = distance
-        if dest is None:
-            print("Tile", self.x, self.y, ": No Targets")
-        else:
-            print("Tile", self.x, self.y, ": Targeting tile", dest.x, dest.y,
-                  "Neighbor cnt: ", dest.unknown_neighbor_count(),
-                  "Neighbors: ", [(neighbor.x, neighbor.y, neighbor.tile) for neighbor in dest._neighbors])
+        # if dest is None:
+        #     print("Tile", self.x, self.y, ": No Targets")
+        # else:
+        #     print("Tile", self.x, self.y, ": Targeting tile", dest.x, dest.y,
+        #           "Neighbor cnt: ", dest.unknown_neighbor_count(),
+        #           "Neighbors: ", [(neighbor.x, neighbor.y, neighbor.tile) for neighbor in dest._neighbors])
         return dest
 
     def unknown_neighbor_count(self):

@@ -22,14 +22,14 @@ def make_move(current_bot, current_map):
     _bot = current_bot
     _map = current_map
 
-    if move_priority():
+    if move_priority():  # Capture a city or general if I have an adjacent larger force
         return
 
     if _map.turn % 3 == 0:
-        if move_outward():
+        if move_outward():  # Capture a regular tile if it's adjacent - preferably not a swamp
             return
     if not move_toward():
-        move_outward()
+        move_outward()    # We get here on turn 1. not sure if it happens any other time.
     return
 
 
