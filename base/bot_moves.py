@@ -29,10 +29,10 @@ def move_priority(game_map):
                     # if the tile is a general, capture it
                     if tile in generals:
                         priority_move = (neighbor, tile)
-            if priority_move[0]:
-                # TODO: Note, priority moves are repeatedly sent, indicating move making is sending repeated moves
-                # logging.info("Priority Move from %s -> %s" % (priority_move[0], priority_move[1]))
-                break
+            # if priority_move[0]:
+            #     # TODO: Note, priority moves are repeatedly sent, indicating move making is sending repeated moves
+            #     # logging.info("Priority Move from %s -> %s" % (priority_move[0], priority_move[1]))
+            #     break
     return priority_move
 
 
@@ -112,15 +112,25 @@ def _move_path_capture(path):
 # ======================== Move Path Forward ======================== #
 
 def should_move_half(game_map, source, dest=None):
-    if dest is not None and dest.is_city:
+    if dest is not None and dest.is_city and \
+            (not source.is_city or source.army / 4 < dest.army):
         return False
 
     if game_map.turn > 250:
         if source.is_general:
             return random.choice([True, True, True, False])
         elif source.is_city:
-            if game_map.turn - source.turn_captured < 16:
+        ## if game_map.turn - source.turn_captured < 16:
+            enemy_neighbors = sum(
+                1 for neighbor in source._neighbors
+                if neighbor.is_enemy()
+            )
+            enemy_neighbors -= dest.is_enemy()  # if one of the surrounding enemy tiles is the dest, then it doesn't count.
+            print(enemy_neighbors)
+            if enemy_neighbors > 0:  # If we don't own all the surrounding land except the destination, move half
                 return True
+            else:
+                return False
             return random.choice([False, False, False, True])
     return False
 

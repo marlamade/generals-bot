@@ -245,15 +245,15 @@ class Map(object):
         if '_map_private' not in dir(self):
             self._map_private = []
             self._cities_private = []
-        if print_cities:
-            print("Turn", data['turn'])
-            print(self._cities_private)
-            print(data['cities_diff'])
+        # if print_cities:
+        #     print("Turn", data['turn'])
+        #     print(self._cities_private)
+        #     print(data['cities_diff'])
         _apply_diff(self._map_private, data['map_diff'])
         _apply_diff(self._cities_private, data['cities_diff'])
-        if print_cities:
-            print(self._cities_private)
-            print("\n")
+        # if print_cities:
+        #     print(self._cities_private)
+        #     print("\n")
 
         # Get Number Rows + Columns
         self.rows, self.cols = self._map_private[1], self._map_private[0]

@@ -207,7 +207,7 @@ class GeneralsViewer(object):
                 # Determine BG Color
                 color = WHITE
                 color_font = WHITE
-                if tile.tile == TILE_MOUNTAIN:  # Mountain
+                if tile.is_mountain:  # Mountain
                     color = BLACK
                 elif tile.tile == TILE_FOG:  # Fog
                     color = GRAY

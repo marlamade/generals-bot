@@ -31,6 +31,17 @@ GENERALS_MAPS = [
     "Hidden 1",
 ]
 
+MARLAS_MAPS = [
+    "PleNiX's Palace",  # fun map
+    "War of Classes Super",  # fun map
+    "ten",              # all cities of 10
+    "-999city",         # all cities of -999
+    "Good is good!",    # swampy
+    "God is amazing",   # swampy
+    "Neapolitan",       # small map with double thick walls
+    "Double Thick",     # big map with double thick walls
+]
+
 DIRECTIONS = [(1, 0), (-1, 0), (0, 1), (0, -1)]
 
 TILE_EMPTY = -1

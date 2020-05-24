@@ -22,6 +22,7 @@ class Tile(object):
         self.turn_first_seen = 0 # First turn the tile was visible to us
         self.army = 0  # Integer Army Count
         self.is_city = False  # Boolean isCity
+        self.is_mountain = False # Whether we know whether this space is a city
         self.is_swamp = False  # Boolean isSwamp
         self.is_general = False  # Boolean isGeneral
 
@@ -66,6 +67,9 @@ class Tile(object):
             self.tile = tile
         if self.army == 0 or army > 0 or tile >= TILE_MOUNTAIN or self.is_swamp:  # Remember Discovered Armies
             self.army = army
+
+        if tile == TILE_MOUNTAIN:
+            self.is_mountain = True
 
         if is_city:
             self.is_city = True
@@ -123,6 +127,10 @@ class Tile(object):
 
     def is_on_team(self):
         return self.tile in self._map.my_team
+
+    def is_enemy(self):
+        print(self.x, self.y, self.tile)
+        return self.tile >= 0 and not self.is_on_team()
 
     def should_not_attack(self):  # DEPRECATED: Use Tile.shouldAttack
         return not self.should_attack()
@@ -306,6 +314,7 @@ class Tile(object):
         self._neighbors = neighbors
         return neighbors
 
+    # ========================== PROPERTIES ============================ #
 
 def _path_reconstruct(came_from, dest):
     current = dest
