@@ -90,7 +90,6 @@ class Tile(object):
         if self.tile != self._map.player_index:
             self._is_main_force = False
 
-
     # ======================== Tile Properties ======================== #
 
     def is_dirty(self):
@@ -104,7 +103,7 @@ class Tile(object):
     def neighbors(self, include_swamps=False, include_cities=True):
         neighbors = []
         for tile in self._neighbors:
-            if (tile.tile != TILE_OBSTACLE or tile.is_city or tile.is_general) and tile.tile != TILE_MOUNTAIN and (
+            if (tile.tile != TILE_OBSTACLE or tile.is_city or tile.is_general) and not tile.is_mountain and (
                     include_swamps or not tile.is_swamp) and (include_cities or not tile.is_city):
                 neighbors.append(tile)
         return neighbors
@@ -261,7 +260,7 @@ class Tile(object):
         if dest is None:
             return []
 
-        frontier = Queue()
+        frontier: Queue[Tile] = Queue()
         frontier.put(self)
         came_from = {self: None}
         army_count = {self: self.army}

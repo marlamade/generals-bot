@@ -122,7 +122,7 @@ def should_move_half(game_map, source, dest=None):
         elif source.is_city:
         ## if game_map.turn - source.turn_captured < 16:
             enemy_neighbors = sum(
-                1 for neighbor in source._neighbors
+                1 for neighbor in source.neighbors(include_cities=True, include_swamps=True)
                 if neighbor.is_enemy()
             )
             enemy_neighbors -= dest.is_enemy()  # if one of the surrounding enemy tiles is the dest, then it doesn't count.

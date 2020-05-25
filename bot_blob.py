@@ -22,6 +22,9 @@ def make_move(current_bot, current_map):
     _bot = current_bot
     _map = current_map
 
+    if leave_swamp():
+        return
+
     if move_priority():  # Capture a city or general if I have an adjacent larger force
         return
 
@@ -67,6 +70,10 @@ def move_toward():
         return True
     return False
 
+# ======================== Move Toward ======================== #
+
+def leave_swamp():
+    return False
 
 # ======================== Main ======================== #
 
