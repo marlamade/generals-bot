@@ -100,11 +100,13 @@ class Tile(object):
             return abs(self.x - dest.x) + abs(self.y - dest.y)
         return 0
 
-    def neighbors(self, include_swamps=False, include_cities=True):
+    def neighbors(self, include_swamps=False, include_cities=True, include_obstacles=False):
         neighbors = []
         for tile in self._neighbors:
-            if (tile.tile != TILE_OBSTACLE or tile.is_city or tile.is_general) and not tile.is_mountain and (
-                    include_swamps or not tile.is_swamp) and (include_cities or not tile.is_city):
+            if  not tile.is_mountain and \
+                    (include_swamps or not tile.is_swamp) and \
+                    (include_cities or not tile.is_city) and \
+                    (include_obstacles or tile.tile != TILE_OBSTACLE):
                 neighbors.append(tile)
         return neighbors
 
@@ -128,7 +130,6 @@ class Tile(object):
         return self.tile in self._map.my_team
 
     def is_enemy(self):
-        print(self.x, self.y, self.tile)
         return self.tile >= 0 and not self.is_on_team()
 
     def should_not_attack(self):  # DEPRECATED: Use Tile.shouldAttack
@@ -297,6 +298,63 @@ class Tile(object):
         path = _path_reconstruct(came_from, dest)
 
         return path
+
+    def get_swamp_paths(self):
+        swamp_paths = []
+        frontier: Queue[Tile] = Queue()
+        frontier.put(self)
+        came_from = {self: None}
+
+        while not frontier.empty():
+            current = frontier.get()
+
+            for neighbor in current.neighbors(include_swamps=True, include_cities=True, include_obstacles=True):
+                if neighbor in came_from:
+                    continue
+                came_from[neighbor] = current
+                if neighbor.is_swamp:
+                    frontier.put(neighbor)
+
+                elif not neighbor.is_mountain and not neighbor.is_on_team():
+                    path = []
+                    rev_path_current = neighbor
+                    while rev_path_current is not None:
+                        path.append(rev_path_current)
+                        rev_path_current = came_from[rev_path_current]
+
+                    path.reverse()
+                    swamp_paths.append(path)
+
+        return swamp_paths
+
+    def get_best_swamp_path(self):
+        swamp_paths = self.get_swamp_paths()
+        if not swamp_paths:
+            # The swamp is a dead end or we've already explored the other sides
+            return []
+        # there is a city at the end that I can capture
+        capture_paths = [
+            path for path in swamp_paths
+            if (path[-1].is_city or path[-1].tile == TILE_EMPTY) and
+               not path[-1].is_on_team() and
+               path[-1].army < self.army - len(path) - 1
+        ]
+        if capture_paths:
+            shortest_path = min(capture_paths, key=len)
+            return shortest_path
+        # there is something new to see at the end, go for that
+        explore_paths = [
+            path for path in swamp_paths
+            if path[-1].tile in [TILE_FOG, TILE_OBSTACLE] and not path[-1].is_mountain
+               and len(path) < self.army - 1
+        ]
+        if explore_paths:
+            shortest_path = min(explore_paths, key=len)
+            return shortest_path
+
+        # otherwise follow any of the other paths
+        shortest_path = min(swamp_paths, key=len)
+        return shortest_path
 
     # ======================== PRIVATE FUNCTIONS ======================== #
 

@@ -5,12 +5,14 @@
 """
 import logging
 import random
+from pprint import pprint
 
 from base import bot_base
 from .client.constants import *
 
-
 # ======================== Move Priority Capture ======================== #
+from .client.map import Map
+
 
 def move_priority(game_map):
     priority_move = (False, False)
@@ -47,7 +49,8 @@ def move_outward(game_map, path=None):
     """
     if path is None:
         path = []
-    move_swamp = (False, False)
+    swamp_moves = []
+    # move_swamp = (False, False)
 
     for source in game_map.tiles[game_map.player_index]:  # Check Each Owned Tile
         if source.army >= 2 and source not in path:  # Find One With Armies
@@ -55,9 +58,14 @@ def move_outward(game_map, path=None):
             if target:
                 if not target.is_swamp:
                     return source, target
-                move_swamp = (source, target)
+                swamp_moves.append((source, target))
 
-    return move_swamp
+    for source, swamp in swamp_moves:
+        swamp_paths = swamp.get_swamp_paths()
+        if swamp_paths:
+            return source, swamp
+
+    return (False, False)
 
 
 # ======================== Move Path Forward ======================== #
@@ -120,13 +128,12 @@ def should_move_half(game_map, source, dest=None):
         if source.is_general:
             return random.choice([True, True, True, False])
         elif source.is_city:
-        ## if game_map.turn - source.turn_captured < 16:
+            ## if game_map.turn - source.turn_captured < 16:
             enemy_neighbors = sum(
                 1 for neighbor in source.neighbors(include_cities=True, include_swamps=True)
                 if neighbor.is_enemy()
             )
             enemy_neighbors -= dest.is_enemy()  # if one of the surrounding enemy tiles is the dest, then it doesn't count.
-            print(enemy_neighbors)
             if enemy_neighbors > 0:  # If we don't own all the surrounding land except the destination, move half
                 return True
             else:
@@ -164,6 +171,18 @@ def path_gather(game_map, elso_do=None):
     if source and target and source != target:
         return source.path_to(target)
     return elso_do
+
+
+# ======================== Helpers ======================== #
+
+def leave_swamp(game_map: Map):
+    for tile in game_map.tiles[game_map.player_index]:
+        if tile.is_swamp:
+            best_swamp_path = tile.get_best_swamp_path()
+            if best_swamp_path and len(best_swamp_path) >= 2:
+                print("leaving swamp:", best_swamp_path)
+                return best_swamp_path[0], best_swamp_path[1]
+    return (False, False)
 
 
 # ======================== Helpers ======================== #

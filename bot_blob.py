@@ -66,6 +66,7 @@ def move_toward():
     _map.path = bot_moves.path_proximity_target(_map)
     (move_from, move_to) = bot_moves.move_path(_map.path)
     if move_from and move_to:
+        print("move_toward:", move_from, move_to)
         place_move(move_from, move_to)
         return True
     return False
@@ -74,6 +75,10 @@ def move_toward():
 # ======================== Move Toward ======================== #
 
 def leave_swamp():
+    (source, dest) = bot_moves.leave_swamp(_map)
+    if source and dest:
+        place_move(source, dest)
+        return True
     return False
 
 # ======================== Main ======================== #
