@@ -70,6 +70,7 @@ def move_toward():
         return True
     return False
 
+
 # ======================== Move Toward ======================== #
 
 def leave_swamp():
