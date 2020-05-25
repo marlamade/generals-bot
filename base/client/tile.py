@@ -32,6 +32,8 @@ class Tile(object):
         self._dirty_update_time = 0  # Last time Tile was updated by bot, not server
         self._is_main_force = False
 
+        self._distances = [[None for _1 in range(game_map.rows)] for _2 in range(game_map.cols)]
+
     def __repr__(self):
         return "(%2d,%2d)[%2d,%3d]" % (self.x, self.y, self.tile, self.army)
 
@@ -97,7 +99,9 @@ class Tile(object):
 
     def distance_to(self, dest):
         if dest is not None:
-            return abs(self.x - dest.x) + abs(self.y - dest.y)
+            if self._distances[dest.x][dest.y] is None:
+                self._distances[dest.x][dest.y] = abs(self.x - dest.x) + abs(self.y - dest.y)
+            return self._distances[dest.x][dest.y]
         return 0
 
     def neighbors(self, include_swamps=False, include_cities=True, include_obstacles=False):
@@ -112,7 +116,10 @@ class Tile(object):
 
     def is_valid_target(self):  # Check tile to verify reachability
         if self.tile in (TILE_MOUNTAIN, TILE_FOG, TILE_OBSTACLE):
+        # if self.is_mountain:
             return False
+        # if self.is_swamp and self.turn_held > 0:
+        #     return False
         for tile in self.neighbors(include_swamps=True):
             if tile.turn_held > 0:
                 return True
@@ -162,6 +169,8 @@ class Tile(object):
 
         target = None
         for neighbor in self.neighbors(include_swamps=True):
+            if target is None:
+                target = neighbor
             # Move into caputurable target Tiles
             if (neighbor.should_attack() and self.army > neighbor.army + 1) or neighbor in path:
                 if not neighbor.is_swamp:
@@ -230,13 +239,13 @@ class Tile(object):
                     distance = distance * (1.6 * tile.army / self.army)
 
                 if tile.is_swamp:  # Swamps appear further away
-                    distance = distance * 10
+                    distance = distance * 10 * 9999
                     if tile.turn_held > 0:  # Swamps which have been held appear even further away
                         distance = distance * 3
 
                 # Tiles with unknown neighbors appear closer
-                distance *= 4 - tile.unknown_neighbor_count() * 1
-                distance *= 4 - tile.unknown_neighbor_count() * 1
+                # distance *= 4 - tile.unknown_neighbor_count() * 1
+                # distance *= 4 - tile.unknown_neighbor_count() * 1
 
                 if distance < dest_distance:  # ----- Set nearest target -----
                     dest = tile
@@ -274,6 +283,8 @@ class Tile(object):
                 break
 
             for next in current.neighbors(include_swamps=True, include_cities=include_cities):
+                if next.is_swamp:
+                    print("Finding path", next)
                 if next not in processed and (next.is_on_team() or next == dest or next.army < army_count[current]):
                     # priority = self.distance(next, dest)
                     if next not in came_from:
@@ -299,7 +310,11 @@ class Tile(object):
 
         return path
 
-    def get_swamp_paths(self):
+    def get_swamp_paths(self, armies=1e7):
+        """
+        :param armies: number of armies that an adjacent tile is considering sending here
+        :return:
+        """
         swamp_paths = []
         frontier: Queue[Tile] = Queue()
         frontier.put(self)
@@ -321,9 +336,10 @@ class Tile(object):
                     while rev_path_current is not None:
                         path.append(rev_path_current)
                         rev_path_current = came_from[rev_path_current]
-
-                    path.reverse()
-                    swamp_paths.append(path)
+                    print("Path found from %s: %s; Len = %s, self.army = %s" % (self, path, len(path), self.army))
+                    if 2 * (len(path) + 1)< armies:
+                        path.reverse()
+                        swamp_paths.append(path)
 
         return swamp_paths
 

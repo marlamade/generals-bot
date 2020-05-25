@@ -52,17 +52,23 @@ def move_outward(game_map, path=None):
     swamp_moves = []
     # move_swamp = (False, False)
 
+    print("trying to move outward")
+
     for source in game_map.tiles[game_map.player_index]:  # Check Each Owned Tile
         if source.army >= 2 and source not in path:  # Find One With Armies
             target = source.neighbor_to_attack(path)
             if target:
                 if not target.is_swamp:
+                    print("move outward:", source, target)
                     return source, target
                 swamp_moves.append((source, target))
 
     for source, swamp in swamp_moves:
-        swamp_paths = swamp.get_swamp_paths()
+        print("Maybe I should move into the swamp? %s -> %s" % (source, swamp))
+        swamp_paths = swamp.get_swamp_paths(source.army)
+        print("Swamp paths: %s" % swamp_paths)
         if swamp_paths:
+            print("move outward:", source, swamp)
             return source, swamp
 
     return (False, False)
@@ -154,11 +160,11 @@ def path_proximity_target(game_map):
     # is the size of my largest army, then return none.
     target = source.nearest_target_tile()
     path = source.path_to(target)
-    # logging.info("Proximity %s -> %s via %s" % (source, target, path))
+    logging.info("Proximity %s -> %s via %s" % (source, target, path))
 
     if not game_map.can_step_path(path):
         path = path_gather(game_map)
-        # logging.info("Proximity FAILED, using path %s" % path)
+        logging.info("Proximity FAILED, using path %s" % path)
     return path
 
 

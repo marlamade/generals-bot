@@ -72,7 +72,7 @@ def move_toward():
     return False
 
 
-# ======================== Move Toward ======================== #
+# ======================== Leave Swamp ======================== #
 
 def leave_swamp():
     (source, dest) = bot_moves.leave_swamp(_map)

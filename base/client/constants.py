@@ -31,14 +31,19 @@ GENERALS_MAPS = [
     "Hidden 1",
 ]
 
-MARLAS_MAPS = [
+MARLAS_TESTING_MAPS = [
+    "ten",          # all cities of 10
+    "Neapolitan",   # small map with double thick walls
+    "Savings",      # straight map with swamps and large cities. Need to save up before attacking the cities.
+    "swurl2",       # a few cities and a swirl in the middle
+]
+
+MARLAS_FUN_MAPS = [
     "PleNiX's Palace",  # fun map
     "War of Classes Super",  # fun map
-    "ten",              # all cities of 10
     "-999city",         # all cities of -999
     "Good is good!",    # swampy
     "God is amazing",   # swampy
-    "Neapolitan",       # small map with double thick walls
     "Double Thick",     # big map with double thick walls
 ]
 
