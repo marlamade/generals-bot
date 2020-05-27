@@ -25,19 +25,26 @@ def make_move(current_bot, current_map):
     if leave_swamp():
         return
 
+    # move_explore()
+    # return
+
     if move_priority():  # Capture a city or general if I have an adjacent larger force
         return
 
     if _map.turn % 3 == 0:
         if move_outward():  # Capture a regular tile if it's adjacent - preferably not a swamp
             return
+    if _map.turn % 100 < 50 and move_explore():
+        return
     if not move_toward():
         move_outward()    # We get here on turn 1. not sure if it happens any other time.
     return
 
 
 def place_move(source, dest):
-    _bot.place_move(source, dest, move_half=bot_moves.should_move_half(_map, source, dest))
+    move_half = bot_moves.should_move_half(_map, source, dest)
+    print("fn place_move. %s -> %s. %s" %(source, dest, move_half))
+    _bot.place_move(source, dest, move_half=move_half)
 
 
 # ======================== Move Priority ======================== #
@@ -66,7 +73,7 @@ def move_toward():
     _map.path = bot_moves.path_proximity_target(_map)
     (move_from, move_to) = bot_moves.move_path(_map.path)
     if move_from and move_to:
-        print("move_toward:", move_from, move_to)
+        # print("move_toward:", move_from, move_to)
         place_move(move_from, move_to)
         return True
     return False
@@ -81,9 +88,19 @@ def leave_swamp():
         return True
     return False
 
+
+# ======================== Explore ======================== #
+
+def move_explore():
+    (source, dest) = bot_moves.move_explore(_map)
+    if source and dest:
+        print("placing move %s %s" %(source, dest))
+        place_move(source, dest)
+        return True
+    return False
 # ======================== Main ======================== #
 
 # Start Game
 
 if __name__ == '__main__':
-    startup.startup(make_move, bot_name="Brobot")
+    startup.startup(make_move, bot_name="Princess_Bottercup")

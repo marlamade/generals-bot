@@ -5,10 +5,13 @@
 """
 
 import logging
+from collections import deque
+import time
 from typing import List
 
 from .constants import *
 from .tile import Tile
+from .TargetTracker import TargetTracker
 
 
 class Map(object):
@@ -38,6 +41,7 @@ class Map(object):
         self.scores = self._get_scores(data)  # List of Player Scores
         self.complete = False  # Boolean Game Complete
         self.result = False  # Boolean Game Result (True = Won)
+        self.exploration_targets = TargetTracker()
 
         # Public/Shared Components
         self.path = []
@@ -191,6 +195,40 @@ class Map(object):
                         target_type = OPP_EMPTY
 
         return target
+
+    def find_exploration_targets(self):
+        print("find exploration start: time %s, turn %s" % (time.time(), self.turn))
+        obstacles = []
+        fog = []
+        bfs_queue: deque[Tile] = deque(self.tiles[self.player_index])
+        processed = set()
+
+        while bfs_queue:
+            current = bfs_queue.popleft()
+            if current in processed:
+                continue
+            if current.tile == TILE_OBSTACLE and not current.is_city and not current.is_mountain:
+                obstacles.append(current)
+            elif current.tile == TILE_FOG and not current.is_general and not current.is_basic:
+                fog.append(current)
+            processed.add(current)
+            for neighbor in current.neighbors(True, True, True):
+                if not neighbor.is_mountain:
+                    bfs_queue.append(neighbor)
+
+        print(obstacles)
+        obstacles.reverse()
+        fog.reverse()
+        self.exploration_targets.update_list(obstacles, self.turn)
+        print("find exploration end: time %s, turn %s" % (time.time(), self.turn))
+
+    def get_exploration_target(self):
+        target = self.exploration_targets.get_target(self.turn)
+        if target is None:
+            self.find_exploration_targets()
+            target = self.exploration_targets.get_target(self.turn)
+        return target
+
 
     # ======================== Validators ======================== #
 

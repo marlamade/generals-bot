@@ -56,6 +56,7 @@ class GeneralsBot(object):
                                        public_server=self._public_server)
         _create_thread(self._send_start_msg_cmd)
 
+
         # Start Receiving Updates
         for game_map in self._game.get_updates():
             self._set_update(game_map)

@@ -52,23 +52,17 @@ def move_outward(game_map, path=None):
     swamp_moves = []
     # move_swamp = (False, False)
 
-    print("trying to move outward")
-
     for source in game_map.tiles[game_map.player_index]:  # Check Each Owned Tile
         if source.army >= 2 and source not in path:  # Find One With Armies
             target = source.neighbor_to_attack(path)
             if target:
                 if not target.is_swamp:
-                    print("move outward:", source, target)
                     return source, target
                 swamp_moves.append((source, target))
 
     for source, swamp in swamp_moves:
-        print("Maybe I should move into the swamp? %s -> %s" % (source, swamp))
         swamp_paths = swamp.get_swamp_paths(source.army)
-        print("Swamp paths: %s" % swamp_paths)
         if swamp_paths:
-            print("move outward:", source, swamp)
             return source, swamp
 
     return (False, False)
@@ -159,12 +153,12 @@ def path_proximity_target(game_map):
     # find the best enemy target to attack. If all enemy tiles have more that 4x+14 army, where x
     # is the size of my largest army, then return none.
     target = source.nearest_target_tile()
-    path = source.path_to(target)
-    logging.info("Proximity %s -> %s via %s" % (source, target, path))
+    path = source.path_to(target, include_cities=True)
+    # logging.info("Proximity %s -> %s via %s" % (source, target, path))
 
     if not game_map.can_step_path(path):
         path = path_gather(game_map)
-        logging.info("Proximity FAILED, using path %s" % path)
+        # logging.info("Proximity FAILED, using path %s" % path)
     return path
 
 
@@ -179,17 +173,37 @@ def path_gather(game_map, elso_do=None):
     return elso_do
 
 
-# ======================== Helpers ======================== #
+# ======================== Moves added by Marla ======================== #
 
 def leave_swamp(game_map: Map):
     for tile in game_map.tiles[game_map.player_index]:
         if tile.is_swamp:
             best_swamp_path = tile.get_best_swamp_path()
             if best_swamp_path and len(best_swamp_path) >= 2:
-                print("leaving swamp:", best_swamp_path)
                 return best_swamp_path[0], best_swamp_path[1]
     return (False, False)
 
+
+def move_explore(game_map: Map):
+    # source = game_map.find_largest_tile(include_general=0.5)
+    target = game_map.get_exploration_target()
+    if target is None:
+        return False, False
+
+    source, dest = target.step_toward_me()
+    print("Exploration targeting %s. First step: %s -> %s" %(target, source, dest))
+
+    return source, dest
+
+
+    #
+    # path = source.path_to(target, include_obstacles=True, include_cities=True)
+    # # logging.info("Explore %s -> %s via %s" % (source, target, path))
+    #
+    # if len(path) >= 2:
+    #     return path[0], path[1]
+    # else:
+    #     return False, False
 
 # ======================== Helpers ======================== #
 

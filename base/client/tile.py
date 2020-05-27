@@ -3,7 +3,7 @@
     Generals.io Automated Client - https://github.com/harrischristiansen/generals-bot
     Tile: Objects for representing Generals IO Tiles
 """
-
+from collections import deque
 from queue import Queue
 import time
 import logging
@@ -25,6 +25,7 @@ class Tile(object):
         self.is_mountain = False # Whether we know whether this space is a city
         self.is_swamp = False  # Boolean isSwamp
         self.is_general = False  # Boolean isGeneral
+        self.is_basic = False  # True once we have confirmed there is no general, city, mountain, or swamp here.
 
         # Private Properties
         self._map = game_map  # Pointer to Map Object
@@ -32,7 +33,7 @@ class Tile(object):
         self._dirty_update_time = 0  # Last time Tile was updated by bot, not server
         self._is_main_force = False
 
-        self._distances = [[None for _1 in range(game_map.rows)] for _2 in range(game_map.cols)]
+        self._distances = {}
 
     def __repr__(self):
         return "(%2d,%2d)[%2d,%3d]" % (self.x, self.y, self.tile, self.army)
@@ -73,6 +74,9 @@ class Tile(object):
         if tile == TILE_MOUNTAIN:
             self.is_mountain = True
 
+        if self.tile == TILE_FOG and tile != TILE_FOG and not is_general:
+            self.is_basic = True
+
         if is_city:
             self.is_city = True
             self.is_general = False
@@ -99,15 +103,15 @@ class Tile(object):
 
     def distance_to(self, dest):
         if dest is not None:
-            if self._distances[dest.x][dest.y] is None:
-                self._distances[dest.x][dest.y] = abs(self.x - dest.x) + abs(self.y - dest.y)
-            return self._distances[dest.x][dest.y]
+            if dest not in self._distances:
+                self._distances[dest] = abs(self.x - dest.x) + abs(self.y - dest.y)
+            return self._distances[dest]
         return 0
 
     def neighbors(self, include_swamps=False, include_cities=True, include_obstacles=False):
         neighbors = []
         for tile in self._neighbors:
-            if  not tile.is_mountain and \
+            if not tile.is_mountain and \
                     (include_swamps or not tile.is_swamp) and \
                     (include_cities or not tile.is_city) and \
                     (include_obstacles or tile.tile != TILE_OBSTACLE):
@@ -266,7 +270,7 @@ class Tile(object):
 
     # ======================== Pathfinding ======================== #
 
-    def path_to(self, dest, include_cities=False):
+    def path_to(self, dest, include_cities=False, include_obstacles=False):
         if dest is None:
             return []
 
@@ -282,9 +286,11 @@ class Tile(object):
             if current == dest:  # Found Destination
                 break
 
-            for next in current.neighbors(include_swamps=True, include_cities=include_cities):
-                if next.is_swamp:
-                    print("Finding path", next)
+            for next in current.neighbors(
+                    include_swamps=True,
+                    include_cities=include_cities,
+                    include_obstacles=include_obstacles,
+            ):
                 if next not in processed and (next.is_on_team() or next == dest or next.army < army_count[current]):
                     # priority = self.distance(next, dest)
                     if next not in came_from:
@@ -308,6 +314,7 @@ class Tile(object):
         # Create Path List
         path = _path_reconstruct(came_from, dest)
 
+        self._distances[dest] = len(path)
         return path
 
     def get_swamp_paths(self, armies=1e7):
@@ -336,7 +343,6 @@ class Tile(object):
                     while rev_path_current is not None:
                         path.append(rev_path_current)
                         rev_path_current = came_from[rev_path_current]
-                    print("Path found from %s: %s; Len = %s, self.army = %s" % (self, path, len(path), self.army))
                     if 2 * (len(path) + 1)< armies:
                         path.reverse()
                         swamp_paths.append(path)
@@ -371,6 +377,38 @@ class Tile(object):
         # otherwise follow any of the other paths
         shortest_path = min(swamp_paths, key=len)
         return shortest_path
+
+    def step_toward_me(self):
+        largest_tile = self._map.find_largest_tile()
+        bfs_queue: deque[Tile] = deque([self])
+        processed = set()
+        go_next = {self:None}
+        opposing_strength = {self:self.army}
+
+        while bfs_queue:
+            current = bfs_queue.popleft()
+            if current == largest_tile:
+                return False, False
+            if current in processed:
+                continue
+            for neighbor in current.neighbors(True, True, True):
+                if neighbor not in processed:
+                    if neighbor not in go_next:
+                        bfs_queue.append(neighbor)
+                    if neighbor.is_on_team():
+                        next_opposing_strength = opposing_strength[current] - (neighbor.army + 1)
+                    else:
+                        next_opposing_strength = opposing_strength[current] + (neighbor.army + 1) * 1.1
+                    if neighbor.is_swamp:
+                        next_opposing_strength += 1
+                    if neighbor not in opposing_strength or next_opposing_strength < opposing_strength[neighbor]:
+                        opposing_strength[neighbor] = next_opposing_strength
+                        go_next[neighbor] = current
+                    if next_opposing_strength < 0 and neighbor.is_self():
+                        return neighbor, current
+            processed.add(current)
+
+        return False, False
 
     # ======================== PRIVATE FUNCTIONS ======================== #
 
