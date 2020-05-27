@@ -34,7 +34,7 @@ def make_move(current_bot, current_map):
     if _map.turn % 3 == 0:
         if move_outward():  # Capture a regular tile if it's adjacent - preferably not a swamp
             return
-    if _map.turn % 100 < 50 and move_explore():
+    if _map.turn % 500 < 100 and move_explore():
         return
     if not move_toward():
         move_outward()    # We get here on turn 1. not sure if it happens any other time.

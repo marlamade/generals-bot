@@ -173,8 +173,8 @@ class Tile(object):
 
         target = None
         for neighbor in self.neighbors(include_swamps=True):
-            if target is None:
-                target = neighbor
+            # if target is None:
+            #     target = neighbor
             # Move into caputurable target Tiles
             if (neighbor.should_attack() and self.army > neighbor.army + 1) or neighbor in path:
                 if not neighbor.is_swamp:
